@@ -1,0 +1,6 @@
+{
+  "name": "AlMajd - Track your time",
+  "description": "تطبيق احترافي لتتبع الوقت ومراجعة اليوم وتصنيف الأنشطة - المجد تتبع وقتك",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
