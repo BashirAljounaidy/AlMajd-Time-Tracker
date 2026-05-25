@@ -139,10 +139,27 @@ export default function App() {
     }
 
     // 5) Retrieve active stopwatch timer if running
-    const storTimer = localStorage.getItem('chrono_review_active_timer');
-    if (storTimer) {
-      setRunningTimer(JSON.parse(storTimer));
-    }
+    const loadActiveTimer = () => {
+      const storTimer = localStorage.getItem('chrono_review_active_timer');
+      if (storTimer) {
+        setRunningTimer(JSON.parse(storTimer));
+      }
+    };
+    loadActiveTimer();
+
+    // Listen for visibility and focus changes (when app returns to foreground)
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        loadActiveTimer();
+      }
+    };
+    window.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleVisibilityChange);
+
+    return () => {
+      window.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleVisibilityChange);
+    };
   }, []);
 
   // --- PERSIST SAVER HELPERS ---
@@ -213,7 +230,6 @@ export default function App() {
 
   const handleClearDatabaseComplete = () => {
     saveEntriesToDb([]);
-    localStorage.removeItem('chrono_review_time_entries');
   };
 
   // --- INTERACTIVE ACTIONS FLOW ---

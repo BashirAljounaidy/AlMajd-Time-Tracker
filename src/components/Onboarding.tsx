@@ -27,17 +27,17 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete, lang }) => {
     },
     {
       icon: <Target size={40} className="text-[#D4AF37]" />,
-      titleAr: 'مفيد أم غير مفيد؟ تصنيف النفعية',
+      titleAr: 'تقييم وقتك هل تستفيد منه بشكل ممول او غير ممول',
       titleEn: 'Rate Your Usefulness',
       descAr: 'المفتاح السري لإنتاجيتك! قيم كل نشاط تقوم به لتفصيل فترات يومك فوراً لمعرفة فترات التشتت وأوقات العطاء الذهني العالي.',
-      descEn: 'The core metric for time-mastery. Mark activities on our usefulness scale (Useful, Not Useful, Neutral) to diagnose leaks immediately.',
+      descEn: 'The core metric for time-mastery. Mark activities on our usefulness scale (Paid, Free) to diagnose leaks immediately.',
       badge: 'Usefulness Rating',
     },
     {
       icon: <BarChart3 size={40} className="text-[#D4AF37]" />,
       titleAr: 'إحصائيات وتقارير نخبوية',
       titleEn: 'Elite Weekly Diagnostics',
-      descAr: 'حلل وعيك اليومي بالعادات! راقب الأنشطة الأكثر استهلاكاً لوقتك وقارن الأيام واكشف الفترات غير المتعقبة بدقة فائقة.',
+      descAr: 'حلل وعيك اليومي بالأوقات! راقب الأنشطة الأكثر استهلاكاً لوقتك وقارن الأيام',
       descEn: 'Build strict self-awareness. Monitor category pies and compare daily scores with dynamic graphs.',
       badge: 'Smart Metrics',
     },
@@ -54,7 +54,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete, lang }) => {
   };
 
   return (
-    <div 
+    <div
       id="onboarding-bg"
       className="absolute inset-0 bg-[#070707] flex flex-col justify-between p-6 z-50 text-sans"
     >
@@ -74,7 +74,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete, lang }) => {
       </div>
 
       {/* Main Slide Carousel Card */}
-      <div 
+      <div
         id={`onboarding-card-${slide}`}
         className="my-auto py-12 px-6 bg-[#0E0D0A] border border-[#D4AF37]/15 rounded-3xl relative overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.6)]"
       >
@@ -90,7 +90,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete, lang }) => {
         <h2 className="text-2xl font-bold text-stone-100 tracking-tight leading-snug mb-4">
           {isAr ? current.titleAr : current.titleEn}
         </h2>
-        
+
         <p className="text-stone-400 text-sm leading-relaxed mb-6">
           {isAr ? current.descAr : current.descEn}
         </p>
@@ -105,9 +105,8 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete, lang }) => {
               key={idx}
               id={`dot-onboarding-${idx}`}
               onClick={() => setSlide(idx)}
-              className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
-                slide === idx ? 'w-8 bg-[#D4AF37]' : 'w-2 bg-stone-700'
-              }`}
+              className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${slide === idx ? 'w-8 bg-[#D4AF37]' : 'w-2 bg-stone-700'
+                }`}
             />
           ))}
         </div>
@@ -119,8 +118,8 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete, lang }) => {
           className="w-full h-13 rounded-xl bg-gradient-to-r from-[#D5B038] via-[#F3E5AB] to-[#C59B27] hover:from-[#E5C354] hover:to-[#B58B17] text-black font-semibold text-sm flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-amber-500/10 active:scale-[0.98] transition-transform"
         >
           <span>
-            {slide === slides.length - 1 
-              ? (isAr ? 'ابدأ الآن الاستخدام' : 'Get Started') 
+            {slide === slides.length - 1
+              ? (isAr ? 'ابدأ الآن الاستخدام' : 'Get Started')
               : (isAr ? 'المتابعة' : 'Next Step')
             }
           </span>
