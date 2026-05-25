@@ -19,7 +19,6 @@ import {
 } from 'lucide-react';
 
 // Shell and utility imports
-import { NativeSimulator } from './components/NativeSimulator';
 import { SplashScreen } from './components/SplashScreen';
 import { Onboarding } from './components/Onboarding';
 import { TodayView } from './components/TodayView';
@@ -284,13 +283,7 @@ export default function App() {
   };
 
   return (
-    <NativeSimulator 
-      platform={platform} 
-      setPlatform={setPlatform} 
-      lang={lang} 
-      setLang={setLang}
-    >
-
+    <div id="main-app" className="font-sans min-h-screen bg-[#070707] text-[#FAF8F5]" dir={isAr ? 'rtl' : 'ltr'}>
       {/* 1) Dynamic Splash Intro Layer */}
       {showSplash && (
         <SplashScreen 
@@ -438,6 +431,7 @@ export default function App() {
           {/* --- BOTTOM SHIELD NAVIGATION PANEL (Luxury gold highlights) --- */}
           <nav 
             id="app-bottom-nav"
+            dir="rtl"
             className="h-16 px-4 bg-[#0A0A09] border-t border-stone-850 flex justify-between items-center relative z-40 shrink-0 select-none pb-1"
           >
             {/* Tab 1: Today */}
@@ -485,7 +479,7 @@ export default function App() {
               }`}
             >
               <Settings size={18} className={activeTab === 'settings' ? 'stroke-[2.5]' : 'stroke-[1.8]'} />
-              <span className="text-[9.5px] font-semibold tracking-tight">{isAr ? 'الضبط' : 'Console'}</span>
+              <span className="text-[9.5px] font-semibold tracking-tight">{isAr ? 'الضبط' : 'Settings'}</span>
             </button>
           </nav>
 
@@ -577,6 +571,6 @@ export default function App() {
         defaultEndTime={preCalculatedEnd}
       />
 
-    </NativeSimulator>
+    </div>
   );
 }
