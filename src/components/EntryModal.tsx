@@ -92,8 +92,8 @@ export const EntryModal: React.FC<EntryModalProps> = ({
       setTitle(editingEntry.title);
       setCategoryId(editingEntry.category_id);
       setUsefulness(editingEntry.usefulness_status);
-      setStartDateStr(formatISOToInput(editingEntry.start_time));
-      setEndDateStr(formatISOToInput(editingEntry.end_time));
+      setStartDateStr(editingEntry.start_time);
+      setEndDateStr(editingEntry.end_time);
       setDurationMinutes(editingEntry.duration_minutes);
       setNote(editingEntry.note || '');
       setErrorText('');
@@ -109,18 +109,17 @@ export const EntryModal: React.FC<EntryModalProps> = ({
       setOverlapWarning(false);
       setShowDeleteConfirm(false);
 
-      const now = new Date();
       if (defaultStartTime && defaultEndTime) {
-        setStartDateStr(formatISOToInput(defaultStartTime));
-        setEndDateStr(formatISOToInput(defaultEndTime));
+        setStartDateStr(defaultStartTime);
+        setEndDateStr(defaultEndTime);
       } else {
         // Round to nearest 15 mins for cleaner UX
         const start = new Date();
         start.setMinutes(Math.floor(start.getMinutes() / 15) * 15 - 30);
         const end = new Date(start.getTime() + 30 * 60 * 1000);
         
-        setStartDateStr(formatISOToInput(start.toISOString()));
-        setEndDateStr(formatISOToInput(end.toISOString()));
+        setStartDateStr(start.toISOString());
+        setEndDateStr(end.toISOString());
       }
     }
   }, [editingEntry, isOpen, defaultStartTime, defaultEndTime]);
@@ -170,44 +169,23 @@ export const EntryModal: React.FC<EntryModalProps> = ({
     setOverlapWarning(hasOverlap);
   }, [startDateStr, endDateStr, existingEntries, editingEntry]);
 
-  // Format Helper: ISO date string to input-ready "YYYY-MM-DDTHH:mm"
-  function formatISOToInput(isoString: string): string {
-    const d = new Date(isoString);
-    if (isNaN(d.getTime())) return '';
-    const pad = (num: number) => num.toString().padStart(2, '0');
-    const year = d.getFullYear();
-    const month = pad(d.getMonth() + 1);
-    const day = pad(d.getDate());
-    const hours = pad(d.getHours());
-    const minutes = pad(d.getMinutes());
-    return `${year}-${month}-${day}T${hours}-${minutes}`.replace('T', 'T').replace('-', '-'); // standard ISO input format represents with -
-    // Let's do a reliable replacement
-  }
-
-  // Pure picker format
-  function formatISOToInputSecure(isoString: string): string {
+  // Format Helper: ISO date string to input-ready "HH:mm" time format
+  const formatISOToTimeInput = (isoString: string): string => {
     const d = new Date(isoString);
     if (isNaN(d.getTime())) return '';
     const pad = (n: number) => n.toString().padStart(2, '0');
-    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-  }
+    return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  };
 
-  // Adjust formatting once states mount
-  useEffect(() => {
-    if (editingEntry) {
-      setStartDateStr(formatISOToInputSecure(editingEntry.start_time));
-      setEndDateStr(formatISOToInputSecure(editingEntry.end_time));
-    } else if (defaultStartTime && defaultEndTime) {
-      setStartDateStr(formatISOToInputSecure(defaultStartTime));
-      setEndDateStr(formatISOToInputSecure(defaultEndTime));
-    } else {
-      const start = new Date();
-      start.setMinutes(Math.floor(start.getMinutes() / 15) * 15 - 30);
-      const end = new Date(start.getTime() + 30 * 60 * 1000);
-      setStartDateStr(formatISOToInputSecure(start.toISOString()));
-      setEndDateStr(formatISOToInputSecure(end.toISOString()));
-    }
-  }, [editingEntry, defaultStartTime, defaultEndTime, isOpen]);
+  // Merge selected "HH:mm" time back into active date's ISO string
+  const mergeTimeToISO = (timeStr: string, originalIsoStr: string): string => {
+    if (!timeStr || !originalIsoStr) return originalIsoStr;
+    const [hours, minutes] = timeStr.split(':').map(Number);
+    const d = new Date(originalIsoStr);
+    if (isNaN(d.getTime())) return originalIsoStr;
+    d.setHours(hours, minutes, 0, 0);
+    return d.toISOString();
+  };
 
   if (!isOpen) return null;
 
@@ -450,18 +428,13 @@ export const EntryModal: React.FC<EntryModalProps> = ({
               </label>
               <input
                 id="entry-start-time"
-                type="datetime-local"
-                value={startDateStr}
-                onChange={e => !isReadOnly && setStartDateStr(e.target.value)}
+                type="time"
+                value={formatISOToTimeInput(startDateStr)}
+                onChange={e => !isReadOnly && setStartDateStr(mergeTimeToISO(e.target.value, startDateStr))}
                 disabled={isReadOnly}
-                onClick={e => {
-                  try {
-                    if (!isReadOnly) (e.target as any).showPicker();
-                  } catch (err) {}
-                }}
-                className={`w-full bg-[#161613] border focus:border-[#D4AF37] rounded-xl py-2 px-1.5 text-[9.5px] text-stone-200 focus:outline-none relative ${
+                className={`w-full bg-[#161613] border focus:border-[#D4AF37] rounded-xl p-2.5 px-3 text-sm text-stone-200 focus:outline-none relative ${
                   isReadOnly ? 'border-stone-850 cursor-not-allowed text-stone-400' : 'border-stone-800 cursor-pointer'
-                } [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:z-10`}
+                }`}
               />
             </div>
             <div className="space-y-1">
@@ -470,18 +443,13 @@ export const EntryModal: React.FC<EntryModalProps> = ({
               </label>
               <input
                 id="entry-end-time"
-                type="datetime-local"
-                value={endDateStr}
-                onChange={e => !isReadOnly && setEndDateStr(e.target.value)}
+                type="time"
+                value={formatISOToTimeInput(endDateStr)}
+                onChange={e => !isReadOnly && setEndDateStr(mergeTimeToISO(e.target.value, endDateStr))}
                 disabled={isReadOnly}
-                onClick={e => {
-                  try {
-                    if (!isReadOnly) (e.target as any).showPicker();
-                  } catch (err) {}
-                }}
-                className={`w-full bg-[#161613] border focus:border-[#D4AF37] rounded-xl py-2 px-1.5 text-[9.5px] text-stone-200 focus:outline-none relative ${
+                className={`w-full bg-[#161613] border focus:border-[#D4AF37] rounded-xl p-2.5 px-3 text-sm text-stone-200 focus:outline-none relative ${
                   isReadOnly ? 'border-stone-850 cursor-not-allowed text-stone-400' : 'border-stone-800 cursor-pointer'
-                } [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:z-10`}
+                }`}
               />
             </div>
             
