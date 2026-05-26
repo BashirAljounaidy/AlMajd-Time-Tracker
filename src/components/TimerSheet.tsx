@@ -143,9 +143,18 @@ export const TimerSheet: React.FC<TimerSheetProps> = ({
     }
 
     // Determine absolute start time
-    const durationMins = Math.max(1, Math.round(finalSeconds / 60));
-    const nowISO = new Date().toISOString();
-    const startISO = new Date(Date.now() - finalSeconds * 1000).toISOString();
+    const start = new Date(Date.now() - finalSeconds * 1000);
+    const end = new Date();
+
+    // Force end to be capped at 23:59 of the start day
+    const endCapped = new Date(end);
+    endCapped.setFullYear(start.getFullYear(), start.getMonth(), start.getDate());
+    if (endCapped.getHours() > 23 || (endCapped.getHours() === 23 && endCapped.getMinutes() > 59)) {
+      endCapped.setHours(23, 59, 0, 0);
+    }
+
+    const finalDiffMs = endCapped.getTime() - start.getTime();
+    const finalDurationMins = finalDiffMs > 0 ? Math.max(1, Math.round(finalDiffMs / 60000)) : 1;
 
     const defaultIcon = 'Clock';
     const defaultColor = timer.usefulness_status === 'useful' 
@@ -157,9 +166,9 @@ export const TimerSheet: React.FC<TimerSheetProps> = ({
     onSaveTimerEntry({
       title: timer.title.trim() || (isAr ? 'جلسة مؤقتة' : 'Timed Session'),
       category_id: 'default',
-      start_time: startISO,
-      end_time: nowISO,
-      duration_minutes: durationMins,
+      start_time: start.toISOString(),
+      end_time: endCapped.toISOString(),
+      duration_minutes: finalDurationMins,
       note: timer.note.trim() || undefined,
       usefulness_status: timer.usefulness_status,
       icon: defaultIcon,

@@ -93,7 +93,16 @@ export const EntryModal: React.FC<EntryModalProps> = ({
       setCategoryId(editingEntry.category_id);
       setUsefulness(editingEntry.usefulness_status);
       setStartDateStr(editingEntry.start_time);
-      setEndDateStr(editingEntry.end_time);
+      
+      // Ensure start date and end date are on the same calendar day, and end time is capped at 23:59
+      const startD = new Date(editingEntry.start_time);
+      const endD = new Date(editingEntry.end_time);
+      endD.setFullYear(startD.getFullYear(), startD.getMonth(), startD.getDate());
+      if (endD.getHours() > 23 || (endD.getHours() === 23 && endD.getMinutes() > 59)) {
+        endD.setHours(23, 59, 0, 0);
+      }
+      setEndDateStr(endD.toISOString());
+      
       setDurationMinutes(editingEntry.duration_minutes);
       setNote(editingEntry.note || '');
       setErrorText('');
@@ -111,12 +120,32 @@ export const EntryModal: React.FC<EntryModalProps> = ({
 
       if (defaultStartTime && defaultEndTime) {
         setStartDateStr(defaultStartTime);
-        setEndDateStr(defaultEndTime);
+        
+        // Ensure defaultEndTime is on the same day as defaultStartTime and capped at 23:59
+        const startD = new Date(defaultStartTime);
+        const endD = new Date(defaultEndTime);
+        endD.setFullYear(startD.getFullYear(), startD.getMonth(), startD.getDate());
+        if (endD.getTime() <= startD.getTime()) {
+          endD.setHours(23, 59, 0, 0);
+        }
+        if (endD.getHours() > 23 || (endD.getHours() === 23 && endD.getMinutes() > 59)) {
+          endD.setHours(23, 59, 0, 0);
+        }
+        setEndDateStr(endD.toISOString());
       } else {
         // Round to nearest 15 mins for cleaner UX
         const start = new Date();
         start.setMinutes(Math.floor(start.getMinutes() / 15) * 15 - 30);
         const end = new Date(start.getTime() + 30 * 60 * 1000);
+        
+        // Force same day and cap at 23:59
+        end.setFullYear(start.getFullYear(), start.getMonth(), start.getDate());
+        if (end.getTime() <= start.getTime()) {
+          end.setHours(23, 59, 0, 0);
+        }
+        if (end.getHours() > 23 || (end.getHours() === 23 && end.getMinutes() > 59)) {
+          end.setHours(23, 59, 0, 0);
+        }
         
         setStartDateStr(start.toISOString());
         setEndDateStr(end.toISOString());
@@ -187,6 +216,25 @@ export const EntryModal: React.FC<EntryModalProps> = ({
     return d.toISOString();
   };
 
+  // Merge selected "HH:mm" time back into active date's ISO string, but forcing the same date as startDateStr and capping at 23:59
+  const mergeEndTimeToISO = (timeStr: string, startIsoStr: string): string => {
+    if (!timeStr || !startIsoStr) return startIsoStr;
+    let [hours, minutes] = timeStr.split(':').map(Number);
+    
+    // Hard cap at 23:59
+    if (hours > 23) {
+      hours = 23;
+      minutes = 59;
+    } else if (hours === 23 && minutes > 59) {
+      minutes = 59;
+    }
+    
+    const d = new Date(startIsoStr);
+    if (isNaN(d.getTime())) return startIsoStr;
+    d.setHours(hours, minutes, 0, 0);
+    return d.toISOString();
+  };
+
   if (!isOpen) return null;
 
   const handleSuggestionClick = (suggestedText: string) => {
@@ -215,7 +263,14 @@ export const EntryModal: React.FC<EntryModalProps> = ({
       return;
     }
 
-    if (end.getTime() <= start.getTime()) {
+    // Force end to be on the same calendar day as start, and cap at 23:59
+    const endCapped = new Date(end);
+    endCapped.setFullYear(start.getFullYear(), start.getMonth(), start.getDate());
+    if (endCapped.getHours() > 23 || (endCapped.getHours() === 23 && endCapped.getMinutes() > 59)) {
+      endCapped.setHours(23, 59, 0, 0);
+    }
+
+    if (endCapped.getTime() <= start.getTime()) {
       setErrorText(isAr ? 'وقت النهاية يجب أن يكون بعد وقت البداية.' : 'End time must be after start time.');
       return;
     }
@@ -227,14 +282,18 @@ export const EntryModal: React.FC<EntryModalProps> = ({
         ? '#F44336' 
         : '#9E9E9E';
 
+    // Re-calculate final duration based on capped end time
+    const finalDiffMs = endCapped.getTime() - start.getTime();
+    const finalDurationMins = Math.max(1, Math.round(finalDiffMs / 60000));
+
     // Call save payload
     onSave({
       id: editingEntry ? editingEntry.id : Math.random().toString(36).substr(2, 9),
       title: title.trim(),
       category_id: 'default',
       start_time: start.toISOString(),
-      end_time: end.toISOString(),
-      duration_minutes: durationMinutes,
+      end_time: endCapped.toISOString(),
+      duration_minutes: finalDurationMins,
       note: note.trim() || undefined,
       usefulness_status: usefulness,
       icon: defaultIcon,
@@ -430,7 +489,18 @@ export const EntryModal: React.FC<EntryModalProps> = ({
                 id="entry-start-time"
                 type="time"
                 value={formatISOToTimeInput(startDateStr)}
-                onChange={e => !isReadOnly && setStartDateStr(mergeTimeToISO(e.target.value, startDateStr))}
+                onChange={e => {
+                  if (!isReadOnly) {
+                    const newStart = mergeTimeToISO(e.target.value, startDateStr);
+                    setStartDateStr(newStart);
+                    
+                    // Keep endDateStr on the same day as the new start time
+                    const startD = new Date(newStart);
+                    const endD = new Date(endDateStr);
+                    endD.setFullYear(startD.getFullYear(), startD.getMonth(), startD.getDate());
+                    setEndDateStr(endD.toISOString());
+                  }
+                }}
                 disabled={isReadOnly}
                 className={`w-full bg-[#161613] border focus:border-[#D4AF37] rounded-xl py-2 px-1 text-center text-[10.5px] min-[360px]:text-[11.5px] text-stone-200 focus:outline-none relative ${
                   isReadOnly ? 'border-stone-850 cursor-not-allowed text-stone-400' : 'border-stone-800 cursor-pointer'
@@ -444,8 +514,9 @@ export const EntryModal: React.FC<EntryModalProps> = ({
               <input
                 id="entry-end-time"
                 type="time"
+                max="23:59"
                 value={formatISOToTimeInput(endDateStr)}
-                onChange={e => !isReadOnly && setEndDateStr(mergeTimeToISO(e.target.value, endDateStr))}
+                onChange={e => !isReadOnly && setEndDateStr(mergeEndTimeToISO(e.target.value, startDateStr))}
                 disabled={isReadOnly}
                 className={`w-full bg-[#161613] border focus:border-[#D4AF37] rounded-xl py-2 px-1 text-center text-[10.5px] min-[360px]:text-[11.5px] text-stone-200 focus:outline-none relative ${
                   isReadOnly ? 'border-stone-850 cursor-not-allowed text-stone-400' : 'border-stone-800 cursor-pointer'

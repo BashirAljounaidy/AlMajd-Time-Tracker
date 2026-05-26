@@ -2,31 +2,39 @@
 
 /* Global 1.25× font scale – all Tailwind rem units inherit this */
 html {
-  font-size: 20px; /* 16px × 1.25 */
+  font-size: 20px;
+  /* 16px × 1.25 */
 }
 
 @layer utilities {
+
   /* Hide scrollbar for Chrome, Safari and Opera */
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
+
   /* Hide scrollbar for IE, Edge and Firefox */
   .no-scrollbar {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
   }
 
   /* Custom thin gold scrollbar for list containers */
   .custom-scrollbar::-webkit-scrollbar {
     width: 4px;
   }
+
   .custom-scrollbar::-webkit-scrollbar-track {
     background: #0d0d0c;
   }
+
   .custom-scrollbar::-webkit-scrollbar-thumb {
     background: #3a3219;
     border-radius: 4px;
   }
+
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     background: #D4AF37;
   }
@@ -36,6 +44,7 @@ html {
   from {
     transform: translateY(100%);
   }
+
   to {
     transform: translateY(0);
   }
@@ -45,6 +54,7 @@ html {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -57,4 +67,3 @@ html {
 .animate-fadeIn {
   animation: fadeIn 0.2s ease-out forwards;
 }
-
