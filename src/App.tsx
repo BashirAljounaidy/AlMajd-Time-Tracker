@@ -318,13 +318,13 @@ export default function App() {
   };
 
   const handleClearAllDataComplete = () => {
-    localStorage.removeItem('chrono_review_time_entries');
-    localStorage.removeItem('chrono_review_achieved_days_history');
+    localStorage.setItem('chrono_review_time_entries', '[]');
+    localStorage.setItem('chrono_review_achieved_days_history', '{}');
     localStorage.removeItem('chrono_review_active_timer');
     localStorage.removeItem('chrono_review_stats');
     localStorage.removeItem('productiveGoalHours');
     localStorage.removeItem('goal_achieved_days');
-    localStorage.removeItem('chrono_review_onboarding_completed');
+    localStorage.setItem('chrono_review_onboarding_completed', 'true'); // Keep onboarding skipped/completed
 
     setEntries([]);
     setAchievedDaysHistory({});
