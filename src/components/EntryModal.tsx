@@ -432,7 +432,7 @@ export const EntryModal: React.FC<EntryModalProps> = ({
                 value={formatISOToTimeInput(startDateStr)}
                 onChange={e => !isReadOnly && setStartDateStr(mergeTimeToISO(e.target.value, startDateStr))}
                 disabled={isReadOnly}
-                className={`w-full bg-[#161613] border focus:border-[#D4AF37] rounded-xl py-2.5 px-2 text-center text-xs min-[360px]:text-sm text-stone-200 focus:outline-none relative ${
+                className={`w-full bg-[#161613] border focus:border-[#D4AF37] rounded-xl py-2 px-1 text-center text-[10.5px] min-[360px]:text-[11.5px] text-stone-200 focus:outline-none relative ${
                   isReadOnly ? 'border-stone-850 cursor-not-allowed text-stone-400' : 'border-stone-800 cursor-pointer'
                 }`}
               />
@@ -447,7 +447,7 @@ export const EntryModal: React.FC<EntryModalProps> = ({
                 value={formatISOToTimeInput(endDateStr)}
                 onChange={e => !isReadOnly && setEndDateStr(mergeTimeToISO(e.target.value, endDateStr))}
                 disabled={isReadOnly}
-                className={`w-full bg-[#161613] border focus:border-[#D4AF37] rounded-xl py-2.5 px-2 text-center text-xs min-[360px]:text-sm text-stone-200 focus:outline-none relative ${
+                className={`w-full bg-[#161613] border focus:border-[#D4AF37] rounded-xl py-2 px-1 text-center text-[10.5px] min-[360px]:text-[11.5px] text-stone-200 focus:outline-none relative ${
                   isReadOnly ? 'border-stone-850 cursor-not-allowed text-stone-400' : 'border-stone-800 cursor-pointer'
                 }`}
               />
