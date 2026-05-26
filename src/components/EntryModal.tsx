@@ -459,7 +459,7 @@ export const EntryModal: React.FC<EntryModalProps> = ({
                     if (!isReadOnly) (e.target as any).showPicker();
                   } catch (err) {}
                 }}
-                className={`w-full bg-[#161613] border focus:border-[#D4AF37] rounded-xl p-3 text-xs text-stone-200 focus:outline-none text-center font-mono relative ${
+                className={`w-full bg-[#161613] border focus:border-[#D4AF37] rounded-xl p-3 text-xs text-stone-200 focus:outline-none relative ${
                   isReadOnly ? 'border-stone-850 cursor-not-allowed text-stone-400' : 'border-stone-800 cursor-pointer'
                 } [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:z-10`}
               />
@@ -479,7 +479,7 @@ export const EntryModal: React.FC<EntryModalProps> = ({
                     if (!isReadOnly) (e.target as any).showPicker();
                   } catch (err) {}
                 }}
-                className={`w-full bg-[#161613] border focus:border-[#D4AF37] rounded-xl p-3 text-xs text-stone-200 focus:outline-none text-center font-mono relative ${
+                className={`w-full bg-[#161613] border focus:border-[#D4AF37] rounded-xl p-3 text-xs text-stone-200 focus:outline-none relative ${
                   isReadOnly ? 'border-stone-850 cursor-not-allowed text-stone-400' : 'border-stone-800 cursor-pointer'
                 } [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:z-10`}
               />
