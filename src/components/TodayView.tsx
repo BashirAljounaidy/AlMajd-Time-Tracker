@@ -157,6 +157,10 @@ export const TodayView: React.FC<TodayViewProps> = ({
           <div className="text-2xl font-extrabold font-sans text-[#D4AF37] tracking-tight uppercase">
             {formatDateString(currentDate)}
           </div>
+          <div className="flex items-center gap-2 mt-2 bg-[#D4AF37]/10 border border-[#D4AF37]/25 text-[#D4AF37] px-3 py-1.5 rounded-xl text-[10px] font-mono tracking-widest uppercase w-fit select-none">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#D4AF37] animate-pulse" />
+            <span>{isAr ? `الهدف اليومي: ${goalHours} ساعات ممولة` : `DAILY TARGET: ${goalHours} FUNDED HOURS`}</span>
+          </div>
         </div>
 
       {/* 2) High-End Bento Scorecard Grid */}
@@ -172,14 +176,9 @@ export const TodayView: React.FC<TodayViewProps> = ({
             <div className="col-span-7 space-y-2.5">
               
                   <div className="space-y-0.5">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] text-stone-500 uppercase tracking-wider font-mono">
-                        {isAr ? 'إجمالي الوقت المسجّل' : 'TOTAL TRACKED'}
-                      </span>
-                      <div className="flex items-center gap-1 text-[9px] text-stone-600 font-mono">
-                        {isAr ? `هدف: ${goalHours} ساعات إنجاز ممول` : `Goal: ${goalHours} funded hours`}
-                      </div>
-                    </div>
+                    <span className="text-[10px] text-stone-500 uppercase tracking-wider font-mono block">
+                      {isAr ? 'إجمالي الوقت المسجّل' : 'TOTAL TRACKED'}
+                    </span>
                     <p id="metric-total-tracked" className="text-stone-100 font-bold text-lg font-sans leading-none flex items-center gap-1">
                       <Clock size={15} className="text-[#D4AF37]" />
                       <span>{formatMins(totalTrackedMins)}</span>
@@ -192,6 +191,9 @@ export const TodayView: React.FC<TodayViewProps> = ({
                 <div>
                   <div className="flex justify-between items-center text-[9px] font-medium leading-none mb-1">
                     <span className="text-[#D4AF37]">{isAr ? '✨ وقت ممول' : '✨ Funded'}</span>
+                    <span className="text-stone-400 font-mono text-[8.5px]">
+                      {isAr ? `المحقق: ${formatMins(usefulMins)} / الهدف: ${goalHours}س` : `Done: ${formatMins(usefulMins)} / Target: ${goalHours}h`}
+                    </span>
                   </div>
                   <div className="h-1 bg-stone-900 rounded-full overflow-hidden">
                     <div 
