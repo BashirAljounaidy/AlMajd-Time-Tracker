@@ -31,7 +31,6 @@ import { TimerSheet } from './components/TimerSheet';
 // Data and Types
 import { TimeEntry, Category, ActiveTimer, UserStats } from './types';
 import { DEFAULT_CATEGORIES } from './utils/categories';
-import { getSeededData } from './utils/dummyData';
 
 // Core Date Strip and Day name extraction helpers for layout alignment
 const getDayNameAr = (date: Date) => {
@@ -125,10 +124,8 @@ export default function App() {
     if (storEntries) {
       setEntries(JSON.parse(storEntries));
     } else {
-      const todayStr = getFormattedDateStr(new Date());
-      const seeded = getSeededData(todayStr);
-      setEntries(seeded);
-      localStorage.setItem('chrono_review_time_entries', JSON.stringify(seeded));
+      setEntries([]);
+      localStorage.setItem('chrono_review_time_entries', JSON.stringify([]));
     }
 
     // 3) Initialize Stats preference target
@@ -277,17 +274,6 @@ export default function App() {
     setEditingEntry(null);
   };
 
-  // Seed databases utility
-  const handleRestoreDefaultSeeds = () => {
-    const todayStr = getFormattedDateStr(new Date());
-    const seeded = getSeededData(todayStr);
-    saveEntriesToDb(seeded);
-    setCategories(DEFAULT_CATEGORIES);
-    localStorage.setItem('chrono_review_categories', JSON.stringify(DEFAULT_CATEGORIES));
-    const d = new Date();
-    d.setHours(12, 0, 0, 0);
-    setCurrentDate(d);
-  };
 
   const handleRestoreBackup = (backupData: any) => {
     try {
@@ -480,7 +466,6 @@ export default function App() {
             <SettingsView
               stats={userStats}
               onUpdateStats={handleUpdateStats}
-              onRestoreSeedData={handleRestoreDefaultSeeds}
               onClearAllData={handleClearAllDataComplete}
               onRestoreBackup={handleRestoreBackup}
               entries={entries}

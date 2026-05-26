@@ -10,7 +10,6 @@ import { UserStats, TimeEntry, Category } from '../types';
 interface SettingsViewProps {
   stats: UserStats;
   onUpdateStats: (newStats: UserStats) => void;
-  onRestoreSeedData: () => void;
   onClearAllData: () => void;
   onRestoreBackup: (data: any) => void;
   entries: TimeEntry[];
@@ -23,7 +22,6 @@ interface SettingsViewProps {
 export const SettingsView: React.FC<SettingsViewProps> = ({
   stats,
   onUpdateStats,
-  onRestoreSeedData,
   onClearAllData,
   onRestoreBackup,
   entries,
@@ -171,17 +169,6 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             </label>
           </div>
 
-          {/* Seed Data Restore */}
-          <button
-            onClick={onRestoreSeedData}
-            className="w-full py-2.5 px-4 bg-[#1C1A14] hover:bg-[#25221A] border border-stone-850 hover:border-stone-700 text-stone-300 hover:text-stone-100 font-medium text-xs rounded-xl cursor-pointer flex items-center justify-between transition-all"
-          >
-            <span className="flex items-center gap-2">
-              <RefreshCw size={14} className="text-stone-500" />
-              <span>{isAr ? 'إعادة تعبئة البيانات الافتراضية' : 'Restore Default Seed Data'}</span>
-            </span>
-            <span className="text-[9px] text-stone-600 font-mono">RESET SEEDS</span>
-          </button>
 
           {/* Wipe All Data */}
           <button
