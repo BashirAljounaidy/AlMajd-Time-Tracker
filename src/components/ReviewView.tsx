@@ -94,7 +94,7 @@ export const ReviewView: React.FC<ReviewViewProps> = ({
   };
 
   return (
-    <div id="review-screen-root" className="flex-1 flex flex-col bg-[#070707] overflow-y-auto no-scrollbar p-5 pb-24 space-y-5">
+    <div id="review-screen-root" className="flex-1 flex flex-col bg-[#070707] overflow-y-auto no-scrollbar p-5 pb-[180px] space-y-5">
       
       {/* Visual Title Header (Branding block) */}
       <div className="select-none flex flex-col">

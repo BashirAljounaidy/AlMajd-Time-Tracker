@@ -147,7 +147,7 @@ export const TodayView: React.FC<TodayViewProps> = ({
       )}
 
       {/* Scrollable Container */}
-      <div className="flex-1 overflow-y-auto no-scrollbar pb-24">
+      <div className="flex-1 overflow-y-auto no-scrollbar pb-[180px]">
         
         {/* Elite Brand Header mimicking the Reference Image */}
         <div className="px-3 pt-4 pb-2 select-none flex flex-col">

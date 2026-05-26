@@ -114,7 +114,7 @@ export const StatsView: React.FC<StatsViewProps> = ({ entries, lang, achievedDay
   };
 
   return (
-    <div id="stats-screen-root" className="flex-1 flex flex-col bg-[#070707] overflow-y-auto no-scrollbar p-5 pb-24 space-y-6">
+    <div id="stats-screen-root" className="flex-1 flex flex-col bg-[#070707] overflow-y-auto no-scrollbar p-5 pb-[180px] space-y-6">
       
       {/* View Header */}
       <div>

@@ -82,7 +82,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   };
 
   return (
-    <div id="settings-screen-root" className="flex-1 flex flex-col bg-[#070707] overflow-y-auto no-scrollbar p-3 pb-16 space-y-3">
+    <div id="settings-screen-root" className="flex-1 flex flex-col bg-[#070707] overflow-y-auto no-scrollbar p-3 pb-[180px] space-y-3">
 
       {/* Title Header */}
       <div>
