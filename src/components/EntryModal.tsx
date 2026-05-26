@@ -398,7 +398,7 @@ export const EntryModal: React.FC<EntryModalProps> = ({
           <div className="space-y-2 p-3 bg-[#1A1914] border border-[#D4AF37]/15 rounded-2xl">
             <label className="text-xs font-bold text-[#D4AF37] tracking-wider block flex items-center gap-1">
               <Tag size={12} />
-              {isAr ? 'هل هذا الوقت مفيد أم غير مفيد؟' : 'Is this tracked time productive / useful?'}
+              {isAr ? 'تصنيف الاستفادة من وقتك: ممول أم مجاني؟' : 'Time Utility: Funded or Free?'}
             </label>
             
             <div className="grid grid-cols-2 gap-2 pt-1">

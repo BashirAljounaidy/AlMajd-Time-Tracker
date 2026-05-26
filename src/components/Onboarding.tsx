@@ -27,11 +27,11 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete, lang }) => {
     },
     {
       icon: <Target size={40} className="text-[#D4AF37]" />,
-      titleAr: 'مفيد أم غير مفيد؟ تصنيف النفعية',
-      titleEn: 'Rate Your Usefulness',
-      descAr: 'المفتاح السري لإنتاجيتك! قيم كل نشاط تقوم به لتفصيل فترات يومك فوراً لمعرفة فترات التشتت وأوقات العطاء الذهني العالي.',
-      descEn: 'The core metric for time-mastery. Mark activities on our usefulness scale (Useful, Not Useful, Neutral) to diagnose leaks immediately.',
-      badge: 'Usefulness Rating',
+      titleAr: 'ممول أم مجاني؟ تصنيف الاستفادة من وقتك',
+      titleEn: 'Funded or Free? Time Utility Rating',
+      descAr: 'المفتاح السري للعمل كرجل أعمال مستقل! قيم كل نشاط وكل لحظة من حياتك: هل ستعود عليك بالفائدة المادية (وقت ممول) أو لا (وقت مجاني)؟',
+      descEn: 'The secret key for freelance business. Rate every activity: will it return a material/financial benefit (Funded) or not (Free)?',
+      badge: 'تقييم الاستفادة',
     },
     {
       icon: <BarChart3 size={40} className="text-[#D4AF37]" />,

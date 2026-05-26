@@ -219,9 +219,9 @@ export const TimerSheet: React.FC<TimerSheetProps> = ({
             />
             <span>
               {timer.usefulness_status === 'useful' 
-                ? (isAr ? 'إنتاجي / مفيد' : 'Productive / Useful') 
+                ? (isAr ? 'ممول' : 'Funded') 
                 : timer.usefulness_status === 'not_useful' 
-                  ? (isAr ? 'ضائع / غير مفيد' : 'Waste / Not Useful') 
+                  ? (isAr ? 'مجاني' : 'Free') 
                   : (isAr ? 'محايد' : 'Neutral')}
             </span>
           </div>
@@ -348,7 +348,7 @@ export const TimerSheet: React.FC<TimerSheetProps> = ({
           {/* Usefulness level rating triggers (The fundamental requested field!) */}
           <div className="space-y-1.5">
             <span className="text-[11px] font-semibold text-stone-400 block">
-              {isAr ? 'هل تعتبر تفعيلك لهذا الوقت مفيداً؟' : 'Productivity designation'}
+              {isAr ? 'تصنيف الاستفادة من وقتك: ممول أم مجاني؟' : 'Time Utility: Funded or Free?'}
             </span>
             <div className="grid grid-cols-2 gap-2">
               <button
@@ -361,7 +361,7 @@ export const TimerSheet: React.FC<TimerSheetProps> = ({
                     : 'bg-[#151512] text-stone-500 border border-stone-850'
                 }`}
               >
-                🟢 {isAr ? 'مفيد' : 'Useful'}
+                🟢 {isAr ? 'ممول' : 'Funded'}
               </button>
 
               <button
@@ -370,11 +370,11 @@ export const TimerSheet: React.FC<TimerSheetProps> = ({
                 onClick={() => onUpdateTimer({ usefulness_status: 'not_useful' })}
                 className={`py-1.5 rounded-lg text-[10px] font-bold transition-all cursor-pointer ${
                   timer.usefulness_status === 'not_useful' 
-                    ? 'bg-stone-500/15 text-stone-500 border border-stone-500' 
+                    ? 'bg-[#F44336]/15 text-[#F44336] border border-[#F44336]' 
                     : 'bg-[#151512] text-stone-500 border border-stone-850'
                 }`}
               >
-                🔴 {isAr ? 'غير مفيد' : 'Not Useful'}
+                🔴 {isAr ? 'مجاني' : 'Free'}
               </button>
             </div>
           </div>
