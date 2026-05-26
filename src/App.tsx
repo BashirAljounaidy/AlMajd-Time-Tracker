@@ -403,7 +403,7 @@ export default function App() {
   };
 
   return (
-    <div id="main-app" className="font-sans h-screen flex flex-col bg-[#070707] text-[#FAF8F5]" dir={isAr ? 'rtl' : 'ltr'}>
+    <div id="main-app" className="font-sans h-[100dvh] flex flex-col bg-[#070707] text-[#FAF8F5] overflow-hidden" dir={isAr ? 'rtl' : 'ltr'}>
       {/* 1) Dynamic Splash Intro Layer */}
       {showSplash && (
         <SplashScreen 
@@ -570,7 +570,7 @@ export default function App() {
           <nav 
             id="app-bottom-nav"
             dir="rtl"
-            className="h-16 px-4 bg-[#0A0A09] border-t border-stone-850 flex justify-between items-center relative z-40 shrink-0 select-none pb-1"
+            className="min-h-[4rem] pb-[calc(4px+env(safe-area-inset-bottom))] px-4 bg-[#0A0A09] border-t border-stone-850 flex justify-between items-center relative z-40 shrink-0 select-none"
           >
             {/* Tab 1: Today */}
             <button
