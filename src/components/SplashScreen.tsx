@@ -71,7 +71,14 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish, lang }) =>
           <span>{isAr ? 'تهيئة التخزين المحلي الآمن' : 'Loading Local Vault'}{dots}</span>
         </div>
 
-
+        {/* Quick Skip Option */}
+        <button
+          id="skip-splash-btn"
+          onClick={onFinish}
+          className="text-[11px] text-[#D4AF37] hover:text-[#FAF8F5] transition-colors py-1.5 px-4 rounded-full bg-[#151410] border border-[#D4AF37]/20 hover:border-[#D4AF37] cursor-pointer"
+        >
+          {isAr ? 'تخطي الانتظار' : 'Skip Intro'}
+        </button>
 
         <div className="flex items-center gap-1.5 text-stone-600 text-[10px] mt-2">
           <ShieldCheck size={12} className="text-[#D4AF37]/40" />

@@ -139,27 +139,10 @@ export default function App() {
     }
 
     // 5) Retrieve active stopwatch timer if running
-    const loadActiveTimer = () => {
-      const storTimer = localStorage.getItem('chrono_review_active_timer');
-      if (storTimer) {
-        setRunningTimer(JSON.parse(storTimer));
-      }
-    };
-    loadActiveTimer();
-
-    // Listen for visibility and focus changes (when app returns to foreground)
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
-        loadActiveTimer();
-      }
-    };
-    window.addEventListener('visibilitychange', handleVisibilityChange);
-    window.addEventListener('focus', handleVisibilityChange);
-
-    return () => {
-      window.removeEventListener('visibilitychange', handleVisibilityChange);
-      window.removeEventListener('focus', handleVisibilityChange);
-    };
+    const storTimer = localStorage.getItem('chrono_review_active_timer');
+    if (storTimer) {
+      setRunningTimer(JSON.parse(storTimer));
+    }
   }, []);
 
   // --- PERSIST SAVER HELPERS ---
@@ -230,6 +213,7 @@ export default function App() {
 
   const handleClearDatabaseComplete = () => {
     saveEntriesToDb([]);
+    localStorage.removeItem('chrono_review_time_entries');
   };
 
   // --- INTERACTIVE ACTIONS FLOW ---
@@ -299,7 +283,7 @@ export default function App() {
   };
 
   return (
-    <div id="main-app" className="font-sans min-h-screen bg-[#070707] text-[#FAF8F5]" dir={isAr ? 'rtl' : 'ltr'}>
+    <div id="main-app" className="font-sans h-screen flex flex-col bg-[#070707] text-[#FAF8F5]" dir={isAr ? 'rtl' : 'ltr'}>
       {/* 1) Dynamic Splash Intro Layer */}
       {showSplash && (
         <SplashScreen 
@@ -384,8 +368,13 @@ export default function App() {
             />
           )}
 
+        </div>
+      )}
+
+      {!showSplash && !showOnboarding && (
+        <>
           {/* --- BOTTOM CALENDAR STRIP & CONTROLS (Directly above Bottom Nav mimicking the picture) --- */}
-          {(!showSplash && !showOnboarding && (activeTab === 'today' || activeTab === 'review')) && (
+          {(activeTab === 'today' || activeTab === 'review') && (
             <div dir="ltr" className="px-4 py-2 bg-[#090908] border-t border-stone-900/40 flex flex-row items-center justify-between select-none shrink-0 w-full">
               
               {/* Horizontal mini date strip scrolling */}
@@ -498,8 +487,7 @@ export default function App() {
               <span className="text-[9.5px] font-semibold tracking-tight">{isAr ? 'الضبط' : 'Settings'}</span>
             </button>
           </nav>
-
-        </div>
+        </>
       )}
 
       {/* --- OPTIONAL FULL-SCALE DRAWER: TIMER CONTROL SHEET --- */}

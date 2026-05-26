@@ -62,12 +62,26 @@ export const TodayView: React.FC<TodayViewProps> = ({
     })
     .sort((a, b) => new Date(b.start_time).getTime() - new Date(a.start_time).getTime());
 
+  const [goalHours, setGoalHours] = React.useState(() => {
+    const saved = localStorage.getItem('productiveGoalHours') || '8';
+    return parseInt(saved);
+  });
+
+  React.useEffect(() => {
+    localStorage.setItem('productiveGoalHours', goalHours.toString());
+  }, [goalHours]);
+
   // Calculations for Today's metrics
   const totalTrackedMins = dailyEntries.reduce((acc, curr) => acc + curr.duration_minutes, 0);
   
   const usefulMins = dailyEntries
     .filter(e => e.usefulness_status === 'useful')
     .reduce((acc, curr) => acc + curr.duration_minutes, 0);
+
+  const productiveGoalMins = goalHours * 60;
+  const progressPercentage = Math.min(100, Math.round((usefulMins / productiveGoalMins) * 100));
+
+  const goalReached = productiveGoalMins > 0 && usefulMins >= productiveGoalMins;
 
   const notUsefulMins = dailyEntries
     .filter(e => e.usefulness_status === 'not_useful')
@@ -126,6 +140,12 @@ export const TodayView: React.FC<TodayViewProps> = ({
   return (
     <div id="today-view-root" className="flex-1 flex flex-col bg-[#070707] relative overflow-hidden">
       
+      {goalReached && (
+        <div className="z-50 bg-[#D4AF37] text-black text-xs font-bold py-3 px-4 shadow-lg text-center w-full">
+            {isAr ? '🎉 تهانينا! حققت هدفك اليومي 🌟' : '🎉 Congratulations! Daily goal achieved! 🌟'}
+        </div>
+      )}
+
       {/* Scrollable Container */}
       <div className="flex-1 overflow-y-auto no-scrollbar pb-24">
         
@@ -151,15 +171,20 @@ export const TodayView: React.FC<TodayViewProps> = ({
             {/* Left side metrics stack: useful, unuseful, tracked */}
             <div className="col-span-7 space-y-2.5">
               
-              <div className="space-y-0.5">
-                <span className="text-[10px] text-stone-500 uppercase tracking-wider font-mono">
-                  {isAr ? 'إجمالي الوقت المسجّل' : 'TOTAL TRACKED'}
-                </span>
-                <p id="metric-total-tracked" className="text-stone-100 font-bold text-lg font-sans leading-none flex items-center gap-1">
-                  <Clock size={15} className="text-[#D4AF37]" />
-                  <span>{formatMins(totalTrackedMins)}</span>
-                </p>
-              </div>
+                  <div className="space-y-0.5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] text-stone-500 uppercase tracking-wider font-mono">
+                        {isAr ? 'إجمالي الوقت المسجّل' : 'TOTAL TRACKED'}
+                      </span>
+                      <div className="flex items-center gap-1 text-[9px] text-stone-600 font-mono">
+                        {isAr ? `هدف: ${goalHours} ساعات إنجاز ممول` : `Goal: ${goalHours} funded hours`}
+                      </div>
+                    </div>
+                    <p id="metric-total-tracked" className="text-stone-100 font-bold text-lg font-sans leading-none flex items-center gap-1">
+                      <Clock size={15} className="text-[#D4AF37]" />
+                      <span>{formatMins(totalTrackedMins)}</span>
+                    </p>
+                  </div>
 
               {/* Progress bars split (Strictly gold & charcoal/bronze) */}
               <div className="space-y-1.5 pt-1 border-t border-stone-900/40">
@@ -207,7 +232,7 @@ export const TodayView: React.FC<TodayViewProps> = ({
                   />
                   <path
                     className="text-[#D4AF37]"
-                    strokeDasharray={`${usefulnessPercentage}, 100`}
+                    strokeDasharray={`${progressPercentage}, 100`}
                     strokeWidth="3.5"
                     strokeLinecap="round"
                     stroke="currentColor"
@@ -218,9 +243,9 @@ export const TodayView: React.FC<TodayViewProps> = ({
 
                 {/* Inner percentage metrics */}
                 <div className="absolute inset-0 flex flex-col items-center justify-center leading-none">
-                  <span id="scorecard-percent" className="font-bold text-lg font-sans text-stone-100">{usefulnessPercentage}%</span>
+                  <span id="scorecard-percent" className="font-bold text-lg font-sans text-stone-100">{progressPercentage}%</span>
                   <span className="text-[7.5px] uppercase text-stone-500 font-mono tracking-wider mt-0.5">
-                    {isAr ? 'مؤشر النفع' : 'Score'}
+                    {isAr ? 'إنجاز' : 'Goal'}
                   </span>
                 </div>
               </div>

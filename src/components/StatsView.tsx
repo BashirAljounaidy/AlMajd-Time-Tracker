@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React from 'react';
-import { BarChart3, TrendingUp, Sparkles, PieChart, Info, HelpCircle, Activity, Award, ThumbsDown, Calendar } from 'lucide-react';
+import React, { useState } from 'react';
+import { BarChart3, TrendingUp, PieChart, Info, HelpCircle, Activity, Award, Calendar } from 'lucide-react';
 import { TimeEntry, UsefulnessStatus } from '../types';
 import { DynamicIcon } from './DynamicIcon';
 
@@ -50,47 +50,57 @@ export const StatsView: React.FC<StatsViewProps> = ({ entries, lang }) => {
     return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
   };
 
-  // Compile daily stats for the week
-  const weeklyData = weekDates.map(date => {
-    const dayStr = getDateStr(date);
-    const dayEntries = entries.filter(e => getDateStr(new Date(e.start_time)) === dayStr);
+  // Compile daily stats for the week-ish (this will be replaced by monthly)
+  const getMonthDays = () => {
+    const dates = [];
+    const today = new Date();
+    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+    const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+
+    for (let d = new Date(firstDay); d <= lastDay; d.setDate(d.getDate() + 1)) {
+      dates.push(new Date(d));
+    }
+    return dates;
+  };
+
+  const monthDates = getMonthDays();
+  const goalHours = parseInt(localStorage.getItem('productiveGoalHours') || '8');
+  const goalMins = goalHours * 60;
+
+  // Persistent tracking of goal achieved days
+  const [achievedDays, setAchievedDays] = React.useState<Record<string, boolean>>(() =>
+    JSON.parse(localStorage.getItem('goal_achieved_days') || '{}')
+  );
+
+  React.useEffect(() => {
+    const newAchievedDays: Record<string, boolean> = {};
     
-    const useful = dayEntries
-      .filter(e => e.usefulness_status === 'useful')
-      .reduce((acc, c) => acc + c.duration_minutes, 0);
+    monthDates.forEach(date => {
+        const dayStr = getDateStr(date);
+        const dayEntries = entries.filter(e => getDateStr(new Date(e.start_time)) === dayStr);
+        const useful = dayEntries
+            .filter(e => e.usefulness_status === 'useful')
+            .reduce((acc, c) => acc + c.duration_minutes, 0);
+        
+        const isAchieved = useful >= goalMins && useful > 0;
+        newAchievedDays[dayStr] = isAchieved;
+    });
 
-    const wasted = dayEntries
-      .filter(e => e.usefulness_status === 'not_useful')
-      .reduce((acc, c) => acc + c.duration_minutes, 0);
-
-    const neutral = 0; // Keeping structure but zeroed out
-
-    return {
-      date,
-      label: getDayLabel(date),
-      useful,
-      wasted,
-      neutral,
-      total: useful + wasted,
-    };
-  });
+    setAchievedDays(newAchievedDays);
+    localStorage.setItem('goal_achieved_days', JSON.stringify(newAchievedDays));
+  }, [entries, goalHours]);
 
   // Calculate highest productive day and total stats
-  let maxProdMins = 0;
-  let bestDayLabel = isAr ? 'لا يوجد سجل' : 'No records';
-  let totalUsefulWeekMins = 0;
-  let totalWastedWeekMins = 0;
-
-  weeklyData.forEach(d => {
-    totalUsefulWeekMins += d.useful;
-    totalWastedWeekMins += d.wasted;
-    if (d.useful > maxProdMins) {
-      maxProdMins = d.useful;
-      bestDayLabel = d.label;
-    }
+  let totalUsefulMonthMins = 0;
+  let totalWastedMonthMins = 0;
+  
+  entries.forEach(e => {
+    if (e.usefulness_status === 'useful') totalUsefulMonthMins += e.duration_minutes;
+    if (e.usefulness_status === 'not_useful') totalWastedMonthMins += e.duration_minutes;
   });
 
-  const avgUsefulDailyMins = Math.round(totalUsefulWeekMins / 7);
+  const avgUsefulDailyMins = Math.round(totalUsefulMonthMins / (monthDates.length || 1));
+  const bestDayLabel = isAr ? 'هذا الشهر' : 'This Month';
 
   // Group by usefulness status for distribution breakdown
   const usefulnessChartMap: { [key in UsefulnessStatus]: { mins: number; labelAr: string; labelEn: string; color: string } } = {
@@ -125,58 +135,6 @@ export const StatsView: React.FC<StatsViewProps> = ({ entries, lang }) => {
     return hrs > 0 ? `${hrs}h ${mins}m` : `${mins}m`;
   };
 
-  // Compile Smart Diagnostics Insights based on real localStorage entries
-  const compileInsights = () => {
-    const list = [];
-    
-    // Check total wasted time
-    const wastedShare = (totalUsefulWeekMins + totalWastedWeekMins) > 0 
-      ? Math.round((totalWastedWeekMins / (totalUsefulWeekMins + totalWastedWeekMins)) * 100) 
-      : 0;
-
-    if (totalWastedWeekMins > 120) {
-      list.push({
-        type: 'warning',
-        ar: `أضعت ما يزيد عن ${formatHrsLabel(totalWastedWeekMins)} هذا الأسبوع في فئات سلبية (مثل اليوتيوب والسوشيال ميديا). تقييد دقائق التطبيقات صباحًا سينقذ إنتاجيتك.`,
-        en: `You dropped over ${formatHrsLabel(totalWastedWeekMins)} this week on unproductive sources like social media/YouTube. Restoring limits will protect high-focus times.`,
-      });
-    } else {
-      list.push({
-        type: 'success',
-        ar: 'مستويات تشتتك ممتازة ومنخفضة للغاية هذا الأسبوع! استمر على هذا الخط الهادئ والواعي.',
-        en: 'Excellent drift prevention! Unproductive slots was kept strictly below 2h this week. Keep up this clean momentum.',
-      });
-    }
-
-    // Check high work hours
-    const workMins = entries.filter(e => e.category_id === 'work').reduce((acc, c) => acc + c.duration_minutes, 0);
-    if (workMins > 480) {
-      list.push({
-        type: 'success',
-        ar: `مستوى رائع في فئة العمل العمودي! قمت بتسجيل ${formatHrsLabel(workMins)} من التركيز التقني الملتزم.`,
-        en: `Incredible logging in Deep Work! You booked over ${formatHrsLabel(workMins)} of pure structural effort.`,
-      });
-    }
-
-    // Checking hobbies
-    const readMins = entries.filter(e => e.category_id === 'reading').reduce((acc, c) => acc + c.duration_minutes, 0);
-    const langMins = entries.filter(e => e.category_id === 'language').reduce((acc, c) => acc + c.duration_minutes, 0);
-    if (readMins > 0 || langMins > 0) {
-      list.push({
-        type: 'success',
-        ar: `تنمية ممتازة للعقل! تم مراجعة ${formatHrsLabel(readMins + langMins)} في القراءة واللغات والتعلم الحر.`,
-        en: `Impressive cognitive investment. You registered ${formatHrsLabel(readMins + langMins)} across reading & free educational pursuits.`,
-      });
-    }
-
-    return list;
-  };
-
-  const smartInsights = compileInsights();
-
-  // Find max bar height for scaling HTML chart (capped at 480 mins max scaling height)
-  const maxWeeklyMins = Math.max(...weeklyData.map(d => d.total), 300);
-
   return (
     <div id="stats-screen-root" className="flex-1 flex flex-col bg-[#070707] overflow-y-auto no-scrollbar p-5 pb-24 space-y-6">
       
@@ -198,50 +156,27 @@ export const StatsView: React.FC<StatsViewProps> = ({ entries, lang }) => {
           <span className="text-stone-500 font-normal lowercase">{isAr ? 'دقائق اليوم' : 'daily minutes'}</span>
         </label>
 
-        {/* Visual HTML columns grid container */}
-        <div className="flex justify-between items-end h-40 pt-4 pb-1 border-b border-stone-900">
-          {weeklyData.map((d, i) => {
-            const usefulHeight = `${(d.useful / maxWeeklyMins) * 100}%`;
-            const wastedHeight = `${(d.wasted / maxWeeklyMins) * 100}%`;
-            const hasActivity = d.total > 0;
-
+        {/* Visual Monthly Calendar Grid */}
+        <div className="grid grid-cols-7 gap-1">
+          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+            <div key={day} className="text-[9px] text-stone-600 text-center font-mono uppercase pb-1">
+              {isAr ? (day === 'Sun' ? 'أحد' : day === 'Mon' ? 'اثنين' : day === 'Tue' ? 'ثلاثاء' : day === 'Wed' ? 'أربعاء' : day === 'Thu' ? 'خميس' : day === 'Fri' ? 'جمعة' : 'سبت') : day}
+            </div>
+          ))}
+          {/* Calendar days */}
+          {monthDates.map((date, i) => {
+            const dayStr = getDateStr(date);
+            const isToday = new Date().toDateString() === date.toDateString();
+            const achieved = achievedDays[dayStr];
+            
             return (
-              <div key={i} className="flex flex-col items-center flex-1 group">
-                {/* Bars column */}
-                <div className="w-full max-w-[12px] h-32 flex flex-col justify-end gap-0.5 rounded-full overflow-hidden relative">
-                  
-                  {/* Useful Bar (Gold) */}
-                  {d.useful > 0 && (
-                    <div 
-                      className="bg-gradient-to-t from-[#8F741D] to-[#D4AF37] rounded-b-md transition-all duration-500"
-                      style={{ height: usefulHeight }}
-                    />
-                  )}
-
-                  {/* Wasted Bar (Charcoal / Dark Bronze) */}
-                  {d.wasted > 0 && (
-                    <div 
-                      className="bg-[#2E2819] rounded-t-md transition-all duration-500"
-                      style={{ height: wastedHeight }}
-                    />
-                  )}
-
-                  {!hasActivity && (
-                    <div className="h-2 w-full bg-stone-900 rounded-full" />
-                  )}
-
-                  {/* Absolute hover tooltip */}
-                  <div className="absolute bottom-[110%] left-1/2 -translate-x-1/2 bg-black text-stone-200 text-[8.5px] p-2 rounded-lg pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity z-50 w-24 text-center border border-[#D4AF37]/20 shadow-xl leading-relaxed">
-                    <span className="font-bold text-[#D4AF37] block font-mono border-b border-stone-850 pb-0.5 mb-1">{d.label}</span>
-                    <span className="text-[#D4AF37] block font-mono">✨ {formatHrsLabel(d.useful)}</span>
-                    <span className="text-stone-550 block font-mono">⏳ {formatHrsLabel(d.wasted)}</span>
-                  </div>
-                </div>
-
-                {/* Day representation label */}
-                <span className="text-[10px] text-stone-500 font-medium font-sans mt-2">
-                  {d.label}
-                </span>
+              <div key={i} className={`h-8 flex flex-col items-center justify-center rounded-lg border text-[10px] ${isToday ? 'border-[#D4AF37]/50 bg-[#D4AF37]/5' : 'border-stone-850 bg-[#0E0D0A]'}`}>
+                <span className={`font-mono ${isToday ? 'text-[#D4AF37] font-bold' : 'text-stone-300'}`}>{date.getDate()}</span>
+                {achieved && (
+                    <svg className="w-3 h-3 text-[#D4AF37]" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M5 16L3 5L8.5 10L12 4L15.5 10L21 5L19 16H5Z" />
+                    </svg>
+                )}
               </div>
             );
           })}
@@ -339,46 +274,6 @@ export const StatsView: React.FC<StatsViewProps> = ({ entries, lang }) => {
         )}
       </div>
 
-      {/* 4) Smart Cognitive Diagnostics AI Insights (التحليلات الذكية المخصصة) */}
-      <div className="space-y-3">
-        <h3 className="text-[11px] uppercase tracking-widest font-mono text-[#D4AF37] font-bold px-1 flex items-center gap-1.5">
-          <Sparkles size={11} className="text-[#D4AF37] animate-pulse" />
-          <span>{isAr ? 'توصيات وتحليلات كرونو الذكية' : 'CHRONO INTELLIGENT ADVICE & TIPS'}</span>
-        </h3>
-
-        <div className="space-y-2.5">
-          {smartInsights.length === 0 ? (
-            <div className="p-4 bg-[#0A0A09] border border-stone-850 rounded-2xl text-center text-xs text-stone-500 italic">
-              {isAr 
-                ? 'استمر في تعقب وقتك لتفعيل محرك الذكاء والتقاط عادات التشتت.' 
-                : 'Compile more logged sessions to spawn customized dynamic insights.'}
-            </div>
-          ) : (
-            smartInsights.map((ins, idx) => (
-              <div 
-                key={idx}
-                id={`insight-card-${idx}`}
-                className={`p-3.5 border rounded-2xl flex items-start gap-3.5 transition-all text-xs leading-relaxed ${
-                  ins.type === 'warning'
-                    ? 'bg-amber-950/10 border-amber-500/20 text-[#FAF8F5]'
-                    : 'bg-[#0E0F0C] border-[#4CAF50]/15 text-[#FAF8F5]'
-                }`}
-              >
-                <div className="shrink-0 mt-0.5">
-                  {ins.type === 'warning' ? (
-                    <ThumbsDown size={14} className="text-amber-500" />
-                  ) : (
-                    <Award size={14} className="text-[#4CAF50]" />
-                  )}
-                </div>
-                <p className="text-stone-400 font-medium">
-                  {isAr ? ins.ar : ins.en}
-                </p>
-              </div>
-            ))
-          )}
-        </div>
-      </div>
 
     </div>
   );
