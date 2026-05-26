@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+/* Global 1.25× font scale – all Tailwind rem units inherit this */
+html {
+  font-size: 20px; /* 16px × 1.25 */
+}
+
 @layer utilities {
   /* Hide scrollbar for Chrome, Safari and Opera */
   .no-scrollbar::-webkit-scrollbar {

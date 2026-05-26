@@ -11,9 +11,10 @@ import { DynamicIcon } from './DynamicIcon';
 interface StatsViewProps {
   entries: TimeEntry[];
   lang: 'ar' | 'en';
+  achievedDaysHistory: Record<string, boolean>;
 }
 
-export const StatsView: React.FC<StatsViewProps> = ({ entries, lang }) => {
+export const StatsView: React.FC<StatsViewProps> = ({ entries, lang, achievedDaysHistory }) => {
   const isAr = lang === 'ar';
 
   // Helper relative weekdays mapping based on current date
@@ -66,29 +67,6 @@ export const StatsView: React.FC<StatsViewProps> = ({ entries, lang }) => {
   const monthDates = getMonthDays();
   const goalHours = parseInt(localStorage.getItem('productiveGoalHours') || '8');
   const goalMins = goalHours * 60;
-
-  // Persistent tracking of goal achieved days
-  const [achievedDays, setAchievedDays] = React.useState<Record<string, boolean>>(() =>
-    JSON.parse(localStorage.getItem('goal_achieved_days') || '{}')
-  );
-
-  React.useEffect(() => {
-    const newAchievedDays: Record<string, boolean> = {};
-    
-    monthDates.forEach(date => {
-        const dayStr = getDateStr(date);
-        const dayEntries = entries.filter(e => getDateStr(new Date(e.start_time)) === dayStr);
-        const useful = dayEntries
-            .filter(e => e.usefulness_status === 'useful')
-            .reduce((acc, c) => acc + c.duration_minutes, 0);
-        
-        const isAchieved = useful >= goalMins && useful > 0;
-        newAchievedDays[dayStr] = isAchieved;
-    });
-
-    setAchievedDays(newAchievedDays);
-    localStorage.setItem('goal_achieved_days', JSON.stringify(newAchievedDays));
-  }, [entries, goalHours]);
 
   // Calculate highest productive day and total stats
   let totalUsefulMonthMins = 0;
@@ -151,9 +129,8 @@ export const StatsView: React.FC<StatsViewProps> = ({ entries, lang }) => {
 
       {/* 1) Weekly performance bar chart (Useful vs Not Useful dual bar) */}
       <div className="p-4 bg-[#0E0D0A] border border-[#D4AF37]/15 rounded-2xl space-y-4 shadow-md">
-        <label className="text-[10px] uppercase font-mono tracking-widest text-[#D4AF37] font-semibold block flex justify-between items-center">
-          <span>{isAr ? 'مقارنة نفعية الوقت الأسبوعية' : 'WEEKLY USEFULNESS COMPARATIVE'}</span>
-          <span className="text-stone-500 font-normal lowercase">{isAr ? 'دقائق اليوم' : 'daily minutes'}</span>
+        <label className="text-[10px] uppercase font-mono tracking-widest text-[#D4AF37] font-semibold block">
+          <span>{isAr ? `احصائيات شهر ${new Date().getMonth() + 1} للعام ${new Date().getFullYear()}` : `Statistics of Month ${new Date().getMonth() + 1} for Year ${new Date().getFullYear()}`}</span>
         </label>
 
         {/* Visual Monthly Calendar Grid */}
@@ -167,7 +144,16 @@ export const StatsView: React.FC<StatsViewProps> = ({ entries, lang }) => {
           {monthDates.map((date, i) => {
             const dayStr = getDateStr(date);
             const isToday = new Date().toDateString() === date.toDateString();
-            const achieved = achievedDays[dayStr];
+            
+            // Calculate today's achieved status dynamically; use history for past days
+            const dayEntries = entries.filter(e => getDateStr(new Date(e.start_time)) === dayStr);
+            const useful = dayEntries
+              .filter(e => e.usefulness_status === 'useful')
+              .reduce((acc, c) => acc + c.duration_minutes, 0);
+
+            const achieved = isToday 
+              ? (useful >= goalMins && useful > 0)
+              : !!achievedDaysHistory[dayStr];
             
             return (
               <div key={i} className={`h-8 flex flex-col items-center justify-center rounded-lg border text-[10px] ${isToday ? 'border-[#D4AF37]/50 bg-[#D4AF37]/5' : 'border-stone-850 bg-[#0E0D0A]'}`}>

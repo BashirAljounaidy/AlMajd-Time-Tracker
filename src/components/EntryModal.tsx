@@ -18,6 +18,7 @@ interface EntryModalProps {
   lang: 'ar' | 'en';
   defaultStartTime?: string; // Prepopulated start time (e.g. from an untracked gap tap)
   defaultEndTime?: string;
+  isReadOnly?: boolean;
 }
 
 export const EntryModal: React.FC<EntryModalProps> = ({
@@ -30,6 +31,7 @@ export const EntryModal: React.FC<EntryModalProps> = ({
   lang,
   defaultStartTime,
   defaultEndTime,
+  isReadOnly = false,
 }) => {
   const isAr = lang === 'ar';
 
@@ -298,6 +300,22 @@ export const EntryModal: React.FC<EntryModalProps> = ({
         {/* Content Body (Scrollable) */}
         <div className="flex-1 overflow-y-auto p-5 space-y-5 custom-scrollbar pb-12">
 
+          {isReadOnly && (
+            <div className="bg-amber-950/20 border border-[#D4AF37]/35 text-amber-200 text-[11px] px-3.5 py-3 rounded-2xl flex items-start gap-2.5 shadow-md">
+              <AlertTriangle size={16} className="text-[#D4AF37] shrink-0 mt-0.5" />
+              <div>
+                <span className="font-bold text-[#D4AF37] block mb-0.5">
+                  {isAr ? 'الأرشيف التاريخي مغلق 🔒' : 'Historical Archive Locked 🔒'}
+                </span>
+                <span className="text-stone-400 leading-snug block">
+                  {isAr 
+                    ? 'بمجرد انتهاء اليوم بعد الساعة 23:59، يتم إغلاق جميع السجلات والإحصائيات تلقائياً وتجميدها للقراءة فقط لضمان دقة والتزام تاريخ أداءك.' 
+                    : 'Once the day ends past 23:59, all records are permanently locked to read-only mode to maintain pristine, uncheatable performance history.'}
+                </span>
+              </div>
+            </div>
+          )}
+
           {/* Error Text Frame */}
           {errorText && (
             <div className="bg-red-950/40 border border-red-500/30 text-red-200 text-xs px-3 py-2 rounded-xl flex items-center gap-2">
@@ -323,52 +341,57 @@ export const EntryModal: React.FC<EntryModalProps> = ({
               type="text"
               placeholder={isAr ? 'مثال: دراسة مصفوفات التفاضل والتكامل، قراءة كتاب' : 'e.g. Deep coding, Duolingo, gym bash'}
               value={title}
-              onChange={e => setTitle(e.target.value)}
-              className="w-full bg-[#161613] border border-stone-800 focus:border-[#D4AF37] rounded-xl px-4 py-2.5 text-sm text-stone-200 placeholder-stone-600 focus:outline-none transition-colors"
+              onChange={e => !isReadOnly && setTitle(e.target.value)}
+              disabled={isReadOnly}
+              className={`w-full bg-[#161613] border focus:border-[#D4AF37] rounded-xl px-4 py-2.5 text-sm text-stone-200 placeholder-stone-600 focus:outline-none transition-colors ${
+                isReadOnly ? 'border-stone-850 cursor-not-allowed text-stone-400' : 'border-stone-800'
+              }`}
             />
             {/* Rapid chips row */}
-            <div className="flex flex-col gap-2 py-1">
-              <div className="flex items-center justify-between">
-                <label className="text-[10px] text-stone-500 font-mono tracking-widest uppercase">
-                  {isAr ? 'اقتراحات سريعة' : 'Quick Suggestions'}
-                </label>
-                <button 
-                  onClick={() => setIsEditingSuggestions(!isEditingSuggestions)}
-                  className="text-[10px] text-[#D4AF37] underline cursor-pointer"
-                >
-                  {isEditingSuggestions ? (isAr ? 'تم' : 'Done') : (isAr ? 'تعديل' : 'Edit')}
-                </button>
-              </div>
-
-              {isEditingSuggestions && (
-                <div className="grid grid-cols-2 gap-2 bg-[#1C1A14] p-2 rounded-xl">
-                  <input placeholder={isAr ? 'العربية' : 'Arabic'} value={newSuggestionAr} onChange={e => setNewSuggestionAr(e.target.value)} className="bg-black/20 p-1.5 rounded text-xs text-white" />
-                  <input placeholder={isAr ? 'English' : 'English'} value={newSuggestionEn} onChange={e => setNewSuggestionEn(e.target.value)} className="bg-black/20 p-1.5 rounded text-xs text-white" />
-                  <button onClick={addSuggestion} className="col-span-2 bg-[#D4AF37]/20 text-[#D4AF37] p-1.5 rounded text-xs font-bold">
-                    {isAr ? 'إضافة' : 'Add'}
+            {!isReadOnly && (
+              <div className="flex flex-col gap-2 py-1">
+                <div className="flex items-center justify-between">
+                  <label className="text-[10px] text-stone-500 font-mono tracking-widest uppercase">
+                    {isAr ? 'اقتراحات سريعة' : 'Quick Suggestions'}
+                  </label>
+                  <button 
+                    onClick={() => setIsEditingSuggestions(!isEditingSuggestions)}
+                    className="text-[10px] text-[#D4AF37] underline cursor-pointer"
+                  >
+                    {isEditingSuggestions ? (isAr ? 'تم' : 'Done') : (isAr ? 'تعديل' : 'Edit')}
                   </button>
                 </div>
-              )}
-              
-              <div className="flex gap-1.5 overflow-x-auto py-1 no-scrollbar text-[11px]">
-                {suggestions.map((sug, i) => (
-                  <div key={i} className="flex items-center gap-1 bg-[#1C1A14] border border-[#D4AF37]/15 rounded-full px-3 py-1 shrink-0 relative">
-                    <button
-                      type="button"
-                      onClick={() => handleSuggestionClick(isAr ? sug.ar : sug.en)}
-                      className="text-[#E5C158] cursor-pointer whitespace-nowrap"
-                    >
-                      {isAr ? sug.ar : sug.en}
+
+                {isEditingSuggestions && (
+                  <div className="grid grid-cols-2 gap-2 bg-[#1C1A14] p-2 rounded-xl">
+                    <input placeholder={isAr ? 'العربية' : 'Arabic'} value={newSuggestionAr} onChange={e => setNewSuggestionAr(e.target.value)} className="bg-black/20 p-1.5 rounded text-xs text-white" />
+                    <input placeholder={isAr ? 'English' : 'English'} value={newSuggestionEn} onChange={e => setNewSuggestionEn(e.target.value)} className="bg-black/20 p-1.5 rounded text-xs text-white" />
+                    <button onClick={addSuggestion} className="col-span-2 bg-[#D4AF37]/20 text-[#D4AF37] p-1.5 rounded text-xs font-bold">
+                      {isAr ? 'إضافة' : 'Add'}
                     </button>
-                    {isEditingSuggestions && (
-                      <button onClick={() => removeSuggestion(i)} className="text-red-500 hover:text-red-300 ml-1">
-                        <X size={10} />
-                      </button>
-                    )}
                   </div>
-                ))}
+                )}
+                
+                <div className="flex gap-1.5 overflow-x-auto py-1 no-scrollbar text-[11px]">
+                  {suggestions.map((sug, i) => (
+                    <div key={i} className="flex items-center gap-1 bg-[#1C1A14] border border-[#D4AF37]/15 rounded-full px-3 py-1 shrink-0 relative">
+                      <button
+                        type="button"
+                        onClick={() => handleSuggestionClick(isAr ? sug.ar : sug.en)}
+                        className="text-[#E5C158] cursor-pointer whitespace-nowrap"
+                      >
+                        {isAr ? sug.ar : sug.en}
+                      </button>
+                      {isEditingSuggestions && (
+                        <button onClick={() => removeSuggestion(i)} className="text-red-500 hover:text-red-300 ml-1">
+                          <X size={10} />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* 2) CORE USEFULNESS SCALE (Crucial requested feature!) */}
@@ -383,8 +406,11 @@ export const EntryModal: React.FC<EntryModalProps> = ({
               <button
                 id="btn-usefulness-useful"
                 type="button"
-                onClick={() => setUsefulness('useful')}
-                className={`py-2 px-1 rounded-xl font-semibold text-xs transition-all flex flex-col items-center gap-1 cursor-pointer ${
+                onClick={() => !isReadOnly && setUsefulness('useful')}
+                disabled={isReadOnly}
+                className={`py-2 px-1 rounded-xl font-semibold text-xs transition-all flex flex-col items-center gap-1 ${
+                  isReadOnly ? 'cursor-not-allowed' : 'cursor-pointer'
+                } ${
                   usefulness === 'useful' 
                     ? 'bg-[#4CAF50]/15 text-[#4CAF50] border-2 border-[#4CAF50]' 
                     : 'bg-stone-900 text-stone-500 border border-stone-800'
@@ -398,8 +424,11 @@ export const EntryModal: React.FC<EntryModalProps> = ({
               <button
                 id="btn-usefulness-notuseful"
                 type="button"
-                onClick={() => setUsefulness('not_useful')}
-                className={`py-2 px-1 rounded-xl font-semibold text-xs transition-all flex flex-col items-center gap-1 cursor-pointer ${
+                onClick={() => !isReadOnly && setUsefulness('not_useful')}
+                disabled={isReadOnly}
+                className={`py-2 px-1 rounded-xl font-semibold text-xs transition-all flex flex-col items-center gap-1 ${
+                  isReadOnly ? 'cursor-not-allowed' : 'cursor-pointer'
+                } ${
                   usefulness === 'not_useful' 
                     ? 'bg-[#F44336]/15 text-[#F44336] border-2 border-[#F44336]' 
                     : 'bg-stone-900 text-stone-500 border border-stone-800'
@@ -423,13 +452,16 @@ export const EntryModal: React.FC<EntryModalProps> = ({
                 id="entry-start-time"
                 type="datetime-local"
                 value={startDateStr}
-                onChange={e => setStartDateStr(e.target.value)}
+                onChange={e => !isReadOnly && setStartDateStr(e.target.value)}
+                disabled={isReadOnly}
                 onClick={e => {
                   try {
-                    (e.target as any).showPicker();
+                    if (!isReadOnly) (e.target as any).showPicker();
                   } catch (err) {}
                 }}
-                className="w-full bg-[#161613] border border-stone-800 focus:border-[#D4AF37] rounded-xl p-3 text-xs text-stone-200 focus:outline-none text-center font-mono relative cursor-pointer [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:z-10"
+                className={`w-full bg-[#161613] border focus:border-[#D4AF37] rounded-xl p-3 text-xs text-stone-200 focus:outline-none text-center font-mono relative ${
+                  isReadOnly ? 'border-stone-850 cursor-not-allowed text-stone-400' : 'border-stone-800 cursor-pointer'
+                } [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:z-10`}
               />
             </div>
             <div className="space-y-1">
@@ -440,13 +472,16 @@ export const EntryModal: React.FC<EntryModalProps> = ({
                 id="entry-end-time"
                 type="datetime-local"
                 value={endDateStr}
-                onChange={e => setEndDateStr(e.target.value)}
+                onChange={e => !isReadOnly && setEndDateStr(e.target.value)}
+                disabled={isReadOnly}
                 onClick={e => {
                   try {
-                    (e.target as any).showPicker();
+                    if (!isReadOnly) (e.target as any).showPicker();
                   } catch (err) {}
                 }}
-                className="w-full bg-[#161613] border border-stone-800 focus:border-[#D4AF37] rounded-xl p-3 text-xs text-stone-200 focus:outline-none text-center font-mono relative cursor-pointer [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:z-10"
+                className={`w-full bg-[#161613] border focus:border-[#D4AF37] rounded-xl p-3 text-xs text-stone-200 focus:outline-none text-center font-mono relative ${
+                  isReadOnly ? 'border-stone-850 cursor-not-allowed text-stone-400' : 'border-stone-800 cursor-pointer'
+                } [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:z-10`}
               />
             </div>
             
@@ -475,8 +510,11 @@ export const EntryModal: React.FC<EntryModalProps> = ({
               rows={2}
               placeholder={isAr ? 'اكتب تدوين سريع، مثلاً: كان نقاشاً حول العقود البرمجية ...' : 'Add custom context tags, thoughts...'}
               value={note}
-              onChange={e => setNote(e.target.value)}
-              className="w-full bg-[#161613] border border-stone-800 focus:border-[#D4AF37] rounded-xl px-4 py-2.5 text-sm text-stone-200 placeholder-stone-600 focus:outline-none transition-colors resize-none"
+              onChange={e => !isReadOnly && setNote(e.target.value)}
+              disabled={isReadOnly}
+              className={`w-full bg-[#161613] border focus:border-[#D4AF37] rounded-xl px-4 py-2.5 text-sm text-stone-200 placeholder-stone-600 focus:outline-none transition-colors resize-none ${
+                isReadOnly ? 'border-stone-850 cursor-not-allowed text-stone-400' : 'border-stone-800'
+              }`}
             />
           </div>
 
@@ -485,58 +523,71 @@ export const EntryModal: React.FC<EntryModalProps> = ({
         {/* Footer Actions Panel */}
         <div className="p-5 border-t border-[#D4AF37]/10 bg-[#12120F] flex flex-col gap-2">
           
-          <button
-            id="btn-save-entry"
-            type="button"
-            onClick={handleSave}
-            className="w-full h-12 rounded-xl bg-gradient-to-r from-[#D5B038] to-[#C59B27] hover:from-[#E5C354] hover:to-[#B58B17] text-[#0C0C0B] font-bold text-sm tracking-wide flex items-center justify-center gap-1.5 cursor-pointer"
-          >
-            <Check size={16} />
-            <span>{isAr ? 'حفظ السجل وتأكيد' : 'Affirm and Save'}</span>
-          </button>
+          {isReadOnly ? (
+            <button
+              id="btn-close-readonly"
+              type="button"
+              onClick={onClose}
+              className="w-full h-12 rounded-xl bg-stone-900 border border-stone-850 hover:border-[#D4AF37]/30 text-stone-300 font-bold text-sm tracking-wide flex items-center justify-center gap-1.5 cursor-pointer transition-all"
+            >
+              <span>{isAr ? 'إغلاق المعاينة' : 'Close Preview'}</span>
+            </button>
+          ) : (
+            <>
+              <button
+                id="btn-save-entry"
+                type="button"
+                onClick={handleSave}
+                className="w-full h-12 rounded-xl bg-gradient-to-r from-[#D5B038] to-[#C59B27] hover:from-[#E5C354] hover:to-[#B58B17] text-[#0C0C0B] font-bold text-sm tracking-wide flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                <Check size={16} />
+                <span>{isAr ? 'حفظ السجل وتأكيد' : 'Affirm and Save'}</span>
+              </button>
 
-          {/* Edit Delete Action */}
-          {editingEntry && onDelete && (
-            <div className="mt-1">
-              {!showDeleteConfirm ? (
-                <button
-                  id="btn-trigger-delete"
-                  type="button"
-                  onClick={() => setShowDeleteConfirm(true)}
-                  className="w-full h-10 rounded-xl bg-transparent border border-red-500/20 hover:border-red-500/50 hover:bg-red-950/20 text-red-400 font-medium text-xs flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
-                >
-                  <Trash2 size={14} />
-                  <span>{isAr ? 'حذف هذا السجل الزمني' : 'Remove record'}</span>
-                </button>
-              ) : (
-                <div className="bg-red-950/20 border border-red-500/30 rounded-xl p-3 flex flex-col gap-2 animate-[fadeIn_0.2s]">
-                  <p className="text-[11px] text-red-200 text-center">
-                    {isAr ? 'هل أنت متأكد تماماً من رغبتك في حذف هذا الوقت؟ لا يمكن التراجع.' : 'Confirm deleting this log permanently?'}
-                  </p>
-                  <div className="grid grid-cols-2 gap-2">
+              {/* Edit Delete Action */}
+              {editingEntry && onDelete && (
+                <div className="mt-1">
+                  {!showDeleteConfirm ? (
                     <button
-                      id="btn-cancel-delete"
+                      id="btn-trigger-delete"
                       type="button"
-                      onClick={() => setShowDeleteConfirm(false)}
-                      className="bg-stone-900 border border-stone-850 rounded-lg text-stone-300 text-[11px] py-1.5 font-medium cursor-pointer"
+                      onClick={() => setShowDeleteConfirm(true)}
+                      className="w-full h-10 rounded-xl bg-transparent border border-red-500/20 hover:border-red-500/50 hover:bg-red-950/20 text-red-400 font-medium text-xs flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
                     >
-                      {isAr ? 'تراجع' : 'Cancel'}
+                      <Trash2 size={14} />
+                      <span>{isAr ? 'حذف هذا السجل الزمني' : 'Remove record'}</span>
                     </button>
-                    <button
-                      id="btn-confirm-delete"
-                      type="button"
-                      onClick={() => {
-                        onDelete(editingEntry.id);
-                        onClose();
-                      }}
-                      className="bg-red-600 hover:bg-red-700 rounded-lg text-white text-[11px] py-1.5 font-semibold cursor-pointer"
-                    >
-                      {isAr ? 'نعم، احذف' : 'Confirm Delete'}
-                    </button>
-                  </div>
+                  ) : (
+                    <div className="bg-red-950/20 border border-red-500/30 rounded-xl p-3 flex flex-col gap-2 animate-[fadeIn_0.2s]">
+                      <p className="text-[11px] text-red-200 text-center">
+                        {isAr ? 'هل أنت متأكد تماماً من رغبتك في حذف هذا الوقت؟ لا يمكن التراجع.' : 'Confirm deleting this log permanently?'}
+                      </p>
+                      <div className="grid grid-cols-2 gap-2">
+                        <button
+                          id="btn-cancel-delete"
+                          type="button"
+                          onClick={() => setShowDeleteConfirm(false)}
+                          className="bg-stone-900 border border-stone-850 rounded-lg text-stone-300 text-[11px] py-1.5 font-medium cursor-pointer"
+                        >
+                          {isAr ? 'تراجع' : 'Cancel'}
+                        </button>
+                        <button
+                          id="btn-confirm-delete"
+                          type="button"
+                          onClick={() => {
+                            onDelete(editingEntry.id);
+                            onClose();
+                          }}
+                          className="bg-red-600 hover:bg-red-700 rounded-lg text-white text-[11px] py-1.5 font-semibold cursor-pointer"
+                        >
+                          {isAr ? 'نعم، احذف' : 'Confirm Delete'}
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
-            </div>
+            </>
           )}
         </div>
 

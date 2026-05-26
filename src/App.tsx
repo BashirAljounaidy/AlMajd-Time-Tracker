@@ -49,6 +49,14 @@ const getFormattedDateStr = (date: Date) => {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 };
 
+const isPastDate = (date: Date) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const target = new Date(date);
+  target.setHours(0, 0, 0, 0);
+  return target.getTime() < today.getTime();
+};
+
 const getDateStripDays = (centerDate: Date) => {
   const list = [];
   for (let i = -2; i <= 2; i++) {
@@ -73,6 +81,7 @@ export default function App() {
   const [entries, setEntries] = useState<TimeEntry[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [userStats, setUserStats] = useState<UserStats>({});
+  const [achievedDaysHistory, setAchievedDaysHistory] = useState<Record<string, boolean>>({});
   const [runningTimer, setRunningTimer] = useState<ActiveTimer>({
     start_time: '',
     accumulated_seconds: 0,
@@ -145,6 +154,68 @@ export default function App() {
     }
   }, []);
 
+  // --- DAY-END EVALUATOR & HISTORICAL FREEZE ---
+  useEffect(() => {
+    const storHistory = localStorage.getItem('chrono_review_achieved_days_history');
+    let history: Record<string, boolean> = {};
+    if (storHistory) {
+      try {
+        history = JSON.parse(storHistory);
+      } catch (e) {
+        history = {};
+      }
+    }
+
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    const getFormattedDate = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+
+    const todayStr = getFormattedDate(new Date());
+    const goalHours = parseInt(localStorage.getItem('productiveGoalHours') || '8');
+    const goalMins = goalHours * 60;
+
+    // We collect all past days that need evaluation:
+    // 1) Past days of this month (to cover empty days)
+    const today = new Date();
+    const currentMonth = today.getMonth();
+    const currentYear = today.getFullYear();
+    const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
+    const pastDatesToEvaluate = new Set<string>();
+
+    for (let d = new Date(firstDayOfMonth); d < today; d.setDate(d.getDate() + 1)) {
+      const dateStr = getFormattedDate(d);
+      if (dateStr < todayStr) {
+        pastDatesToEvaluate.add(dateStr);
+      }
+    }
+
+    // 2) Any past days from entries (to cover previous months' seed data or logs)
+    entries.forEach(e => {
+      const entryDateStr = getFormattedDate(new Date(e.start_time));
+      if (entryDateStr < todayStr) {
+        pastDatesToEvaluate.add(entryDateStr);
+      }
+    });
+
+    let updated = false;
+    pastDatesToEvaluate.forEach(dateStr => {
+      if (history[dateStr] === undefined) {
+        const dayEntries = entries.filter(e => getFormattedDate(new Date(e.start_time)) === dateStr);
+        const useful = dayEntries
+          .filter(e => e.usefulness_status === 'useful')
+          .reduce((acc, c) => acc + c.duration_minutes, 0);
+
+        // Freeze this day: if useful >= goalMins, then it is achieved!
+        history[dateStr] = useful >= goalMins && useful > 0;
+        updated = true;
+      }
+    });
+
+    if (updated || !storHistory) {
+      localStorage.setItem('chrono_review_achieved_days_history', JSON.stringify(history));
+    }
+    setAchievedDaysHistory(history);
+  }, [entries]);
+
   // --- PERSIST SAVER HELPERS ---
   const saveEntriesToDb = (newEntries: TimeEntry[]) => {
     setEntries(newEntries);
@@ -166,6 +237,13 @@ export default function App() {
     const updated = { ...runningTimer, ...updater };
     setRunningTimer(updated);
     localStorage.setItem('chrono_review_active_timer', JSON.stringify(updated));
+  };
+
+  const isEntryReadOnly = () => {
+    if (editingEntry) {
+      return isPastDate(new Date(editingEntry.start_time));
+    }
+    return isPastDate(currentDate);
   };
 
   // --- DATA MANIPULATION HANDLERS ---
@@ -211,9 +289,51 @@ export default function App() {
     setCurrentDate(d);
   };
 
-  const handleClearDatabaseComplete = () => {
-    saveEntriesToDb([]);
+  const handleRestoreBackup = (backupData: any) => {
+    try {
+      if (backupData.entries && Array.isArray(backupData.entries)) {
+        setEntries(backupData.entries);
+        localStorage.setItem('chrono_review_time_entries', JSON.stringify(backupData.entries));
+      }
+      if (backupData.achievedDaysHistory) {
+        setAchievedDaysHistory(backupData.achievedDaysHistory);
+        localStorage.setItem('chrono_review_achieved_days_history', JSON.stringify(backupData.achievedDaysHistory));
+      }
+      if (backupData.categories) {
+        setCategories(backupData.categories);
+        localStorage.setItem('chrono_review_categories', JSON.stringify(backupData.categories));
+      }
+      if (backupData.productiveGoalHours) {
+        localStorage.setItem('productiveGoalHours', backupData.productiveGoalHours.toString());
+      }
+      if (backupData.userStats) {
+        setUserStats(backupData.userStats);
+        localStorage.setItem('chrono_review_stats', JSON.stringify(backupData.userStats));
+      }
+      alert(isAr ? 'تم استعادة النسخة الاحتياطية بنجاح! 🚀' : 'Backup restored successfully! 🚀');
+      window.location.reload();
+    } catch (e) {
+      alert(isAr ? 'فشل استعادة الملف. الرجاء التأكد من أنه ملف صالح.' : 'Failed to restore file. Please verify it is a valid backup.');
+    }
+  };
+
+  const handleClearAllDataComplete = () => {
     localStorage.removeItem('chrono_review_time_entries');
+    localStorage.removeItem('chrono_review_achieved_days_history');
+    localStorage.removeItem('chrono_review_active_timer');
+    localStorage.removeItem('chrono_review_stats');
+    localStorage.removeItem('productiveGoalHours');
+    localStorage.removeItem('goal_achieved_days');
+    localStorage.removeItem('chrono_review_onboarding_completed');
+    
+    setEntries([]);
+    setAchievedDaysHistory({});
+    setUserStats({});
+    setCategories(DEFAULT_CATEGORIES);
+    localStorage.setItem('chrono_review_categories', JSON.stringify(DEFAULT_CATEGORIES));
+    
+    alert(isAr ? 'تم مسح كامل البيانات بنجاح! 🧹' : 'All data wiped successfully! 🧹');
+    window.location.reload();
   };
 
   // --- INTERACTIVE ACTIONS FLOW ---
@@ -352,6 +472,7 @@ export default function App() {
             <StatsView 
               entries={entries}
               lang={lang}
+              achievedDaysHistory={achievedDaysHistory}
             />
           )}
 
@@ -360,9 +481,11 @@ export default function App() {
               stats={userStats}
               onUpdateStats={handleUpdateStats}
               onRestoreSeedData={handleRestoreDefaultSeeds}
-              onClearDb={handleClearDatabaseComplete}
-              onTriggerSplash={handleReplaySplashScreenInUI}
-              entriesCount={entries.length}
+              onClearAllData={handleClearAllDataComplete}
+              onRestoreBackup={handleRestoreBackup}
+              entries={entries}
+              achievedDaysHistory={achievedDaysHistory}
+              categories={categories}
               lang={lang}
               onLangChange={setLang}
             />
@@ -412,8 +535,13 @@ export default function App() {
                 {/* Plus add entry shortcut */}
                 <button
                   id="strip-add-entry-btn"
-                  onClick={() => handleOpenAddEntryModal()}
-                  className="w-11 h-11 rounded-xl bg-[#D4AF37] hover:bg-[#E5C354] border border-[#D4AF37] flex items-center justify-center text-black cursor-pointer transition-all shadow-[0_0_15px_rgba(212,175,55,0.3)] hover:shadow-[0_0_20px_rgba(212,175,55,0.45)] active:scale-95"
+                  onClick={() => !isPastDate(currentDate) && handleOpenAddEntryModal()}
+                  disabled={isPastDate(currentDate)}
+                  className={`w-11 h-11 rounded-xl flex items-center justify-center text-black cursor-pointer transition-all ${
+                    isPastDate(currentDate)
+                      ? 'bg-stone-800 border border-stone-700 text-stone-500 cursor-not-allowed opacity-50'
+                      : 'bg-[#D4AF37] hover:bg-[#E5C354] border border-[#D4AF37] shadow-[0_0_15px_rgba(212,175,55,0.3)] hover:shadow-[0_0_20px_rgba(212,175,55,0.45)] active:scale-95'
+                  }`}
                   title={isAr ? 'اضافة يدوي' : 'Add Manual'}
                 >
                   <Plus size={18} className="stroke-[3]" />
@@ -422,8 +550,13 @@ export default function App() {
                 {/* Stopwatch/Launch timer circle/square option button */}
                 <button
                   id="strip-stopwatch-launch"
-                  onClick={() => handleStartTimerOnTheFly()}
-                  className="w-11 h-11 rounded-xl bg-[#D4AF37] hover:bg-[#E5C354] border border-[#D4AF37] flex items-center justify-center text-black cursor-pointer transition-all shadow-[0_0_15px_rgba(212,175,55,0.3)] hover:shadow-[0_0_20px_rgba(212,175,55,0.45)] active:scale-95"
+                  onClick={() => !isPastDate(currentDate) && handleStartTimerOnTheFly()}
+                  disabled={isPastDate(currentDate)}
+                  className={`w-11 h-11 rounded-xl flex items-center justify-center text-black cursor-pointer transition-all ${
+                    isPastDate(currentDate)
+                      ? 'bg-stone-800 border border-stone-700 text-stone-500 cursor-not-allowed opacity-50'
+                      : 'bg-[#D4AF37] hover:bg-[#E5C354] border border-[#D4AF37] shadow-[0_0_15px_rgba(212,175,55,0.3)] hover:shadow-[0_0_20px_rgba(212,175,55,0.45)] active:scale-95'
+                  }`}
                   title={isAr ? 'تشغيل المؤقت التلقائي' : 'Launch stopwatch'}
                 >
                   <Clock size={16} className="stroke-[2.5]" />
@@ -573,6 +706,7 @@ export default function App() {
         lang={lang}
         defaultStartTime={preCalculatedStart}
         defaultEndTime={preCalculatedEnd}
+        isReadOnly={isEntryReadOnly()}
       />
 
     </div>
