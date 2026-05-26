@@ -37,7 +37,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete, lang }) => {
       icon: <BarChart3 size={40} className="text-[#D4AF37]" />,
       titleAr: 'إحصائيات وتقارير نخبوية',
       titleEn: 'Elite Weekly Diagnostics',
-      descAr: 'حلل وعيك اليومي بالعادات! راقب الأنشطة الأكثر استهلاكاً لوقتك وقارن الأيام واكشف الفترات غير المتعقبة بدقة فائقة.',
+      descAr: 'حلل وقتك بشكل واعي ! راقب الأنشطة الأكثر استهلاكاً لوقتك بشكل مجاني وقارن الأيام واكشف الفترات و الانشطة التي تستهلك وقتك بدون فائدة',
       descEn: 'Build strict self-awareness. Monitor category pies and compare daily scores with dynamic graphs.',
       badge: 'Smart Metrics',
     },
