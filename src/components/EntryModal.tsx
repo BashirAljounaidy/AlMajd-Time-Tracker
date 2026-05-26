@@ -388,7 +388,7 @@ export const EntryModal: React.FC<EntryModalProps> = ({
             {!isReadOnly && (
               <div className="flex flex-col gap-2 py-1">
                 <div className="flex items-center justify-between">
-                  <label className={`text-[10px] text-stone-500 font-mono uppercase ${isAr ? 'tracking-normal' : 'tracking-widest'}`}>
+                  <label className={`text-[10px] text-stone-500 uppercase ${isAr ? 'font-sans tracking-normal' : 'font-mono uppercase tracking-widest'}`}>
                     {isAr ? 'اقتراحات سريعة' : 'Quick Suggestions'}
                   </label>
                   <button 
@@ -433,7 +433,7 @@ export const EntryModal: React.FC<EntryModalProps> = ({
 
           {/* 2) CORE USEFULNESS SCALE (Crucial requested feature!) */}
           <div className="space-y-2 p-3 bg-[#1A1914] border border-[#D4AF37]/15 rounded-2xl">
-            <label className={`text-xs font-bold text-[#D4AF37] block flex items-center gap-1 ${isAr ? 'tracking-normal' : 'tracking-wider'}`}>
+            <label className={`text-xs font-bold text-[#D4AF37] block flex items-center gap-1 ${isAr ? 'font-sans tracking-normal' : 'font-mono uppercase tracking-wider'}`}>
               <Tag size={12} />
               {isAr ? 'تصنيف الاستفادة من وقتك: ممول أم مجاني؟' : 'Time Utility: Funded or Free?'}
             </label>
@@ -541,7 +541,7 @@ export const EntryModal: React.FC<EntryModalProps> = ({
 
           {/* 5) NOTES */}
           <div className="space-y-2">
-            <label className={`text-xs font-semibold text-stone-300 block ${isAr ? 'tracking-normal' : 'tracking-wider'}`}>
+            <label className={`text-xs font-semibold text-stone-300 block ${isAr ? 'font-sans tracking-normal' : 'font-mono uppercase tracking-wider'}`}>
               {isAr ? 'ملاحظة أو تدوينة اختيارية' : 'Personal log or context note (Optional)'}
             </label>
             <textarea

@@ -98,7 +98,7 @@ export const ReviewView: React.FC<ReviewViewProps> = ({
       
       {/* Visual Title Header (Branding block) */}
       <div className="select-none flex flex-col">
-        <span className={`text-[9px] font-mono text-[#D4AF37]/80 uppercase leading-none mb-1 ${isAr ? 'tracking-normal' : 'tracking-widest'}`}>
+        <span className={`text-[9px] text-[#D4AF37]/80 leading-none mb-1 ${isAr ? 'font-sans tracking-normal' : 'font-mono uppercase tracking-widest'}`}>
           {isAr ? 'كشف تسريبات الساعات ومكامن العادات' : 'DIURNAL SLOTS DIAGNOSIS ENGINE'}
         </span>
         <div className="text-3xl font-light font-sans tracking-tight text-stone-300">
@@ -111,7 +111,7 @@ export const ReviewView: React.FC<ReviewViewProps> = ({
 
       {/* A) 24h Visual Block Rug Dashboard (Fascinating block chart!) */}
       <div className="p-4 bg-[#0E0D0A] border border-[#D4AF37]/15 rounded-2xl space-y-3">
-        <label className={`text-[10px] uppercase font-mono text-[#D4AF37] font-semibold block ${isAr ? 'tracking-normal' : 'tracking-widest'}`}>
+        <label className={`text-[10px] text-[#D4AF37] font-semibold block ${isAr ? 'font-sans tracking-normal' : 'font-mono uppercase tracking-widest'}`}>
           {isAr ? 'مخطط الـ 24 ساعة لليوم' : '24-HOUR VISUAL SCHEMATIC'}
         </label>
 
@@ -155,7 +155,7 @@ export const ReviewView: React.FC<ReviewViewProps> = ({
 
       {/* B) Tops Consumers (الأكثر استهلاكاً لوقتك) */}
       <div className="space-y-3">
-        <h3 className={`text-[11px] uppercase font-mono text-stone-500 font-bold px-1 flex items-center gap-1.5 ${isAr ? 'tracking-normal' : 'tracking-widest'}`}>
+        <h3 className={`text-[11px] text-stone-500 font-bold px-1 flex items-center gap-1.5 ${isAr ? 'font-sans tracking-normal' : 'font-mono uppercase tracking-widest'}`}>
           <Flame size={12} className="text-amber-500 animate-pulse" />
           <span>{isAr ? 'أكثر الأنشطة استهلاكاً للوقت' : 'TOP TIME-CONSUMING ACTIVITIES'}</span>
         </h3>
@@ -204,7 +204,7 @@ export const ReviewView: React.FC<ReviewViewProps> = ({
 
       {/* D) Activity Quick-Review Checklist */}
       <div className="space-y-3">
-        <h3 className={`text-[11px] uppercase font-mono text-stone-500 font-bold px-1 ${isAr ? 'tracking-normal' : 'tracking-widest'}`}>
+        <h3 className={`text-[11px] text-stone-500 font-bold px-1 ${isAr ? 'font-sans tracking-normal' : 'font-mono uppercase tracking-widest'}`}>
           {isAr ? 'تعديل السجلات يدوياً' : 'REORDER / DISPOSE REGISTERS'}
         </h3>
 

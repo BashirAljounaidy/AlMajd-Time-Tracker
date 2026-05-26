@@ -205,7 +205,7 @@ export const TimerSheet: React.FC<TimerSheetProps> = ({
           {/* Subtle gold tick lines around the face */}
           <div className="absolute inset-2 rounded-full border border-dashed border-stone-800/40 pointer-events-none" />
           
-          <span className={`text-[10px] uppercase font-mono text-stone-500 ${isAr ? 'tracking-normal' : 'tracking-widest'}`}>
+          <span className={`text-[10px] text-stone-500 ${isAr ? 'font-sans tracking-normal' : 'font-mono uppercase tracking-widest'}`}>
             {timer.is_running ? (isAr ? 'نشط الآن' : 'LIVE TICK') : (isAr ? 'موقوف' : 'PAUSED')}
           </span>
 
@@ -214,7 +214,7 @@ export const TimerSheet: React.FC<TimerSheetProps> = ({
           </span>
 
           <div 
-            className={`flex items-center gap-1.5 px-3 py-1 bg-[#1A1914] rounded-full text-[10px] font-semibold font-mono select-none border ${isAr ? 'tracking-normal' : 'tracking-wider'}`}
+            className={`flex items-center gap-1.5 px-3 py-1 bg-[#1A1914] rounded-full text-[10px] font-semibold select-none border ${isAr ? 'font-sans tracking-normal' : 'font-mono uppercase tracking-wider'}`}
             style={{ 
               color: timer.usefulness_status === 'useful' ? '#D4AF37' : timer.usefulness_status === 'not_useful' ? '#78716c' : '#9E9E9E',
               borderColor: timer.usefulness_status === 'useful' ? '#D4AF3733' : timer.usefulness_status === 'not_useful' ? '#78716c33' : '#9E9E9E33'
@@ -312,7 +312,7 @@ export const TimerSheet: React.FC<TimerSheetProps> = ({
             {/* Quick Suggestions UI */}
             <div className="flex flex-col gap-2 pt-1">
               <div className="flex items-center justify-between">
-                <label className={`text-[10px] text-stone-500 font-mono uppercase ${isAr ? 'tracking-normal' : 'tracking-widest'}`}>
+                <label className={`text-[10px] text-stone-500 uppercase ${isAr ? 'font-sans tracking-normal' : 'font-mono uppercase tracking-widest'}`}>
                   {isAr ? 'اقتراحات سريعة' : 'Quick Suggestions'}
                 </label>
                 <button 

@@ -137,14 +137,14 @@ export const StatsView: React.FC<StatsViewProps> = ({ entries, lang, achievedDay
           <BarChart3 size={18} className="text-[#D4AF37]" strokeWidth={2.5} />
           <span>{isAr ? 'التحليلات ومخططات الوقت' : 'AlMajd Performance Stats'}</span>
         </h2>
-        <p className={`text-[10px] text-stone-500 font-mono uppercase mt-1 ${isAr ? 'tracking-normal' : 'tracking-wider'}`}>
+        <p className={`text-[10px] text-stone-500 mt-1 ${isAr ? 'font-sans tracking-normal' : 'font-mono uppercase tracking-wider'}`}>
           {isAr ? 'تقارير بيانية عن كفاءة استغلال يومك' : 'METRIC GRAPHICS & AUDITING DATA'}
         </p>
       </div>
 
       {/* 1) Weekly performance bar chart (Useful vs Not Useful dual bar) */}
       <div className="p-4 bg-[#0E0D0A] border border-[#D4AF37]/15 rounded-2xl space-y-4 shadow-md">
-        <label className={`text-[10px] uppercase font-mono text-[#D4AF37] font-semibold block ${isAr ? 'tracking-normal' : 'tracking-widest'}`}>
+        <label className={`text-[10px] text-[#D4AF37] font-semibold block ${isAr ? 'font-sans tracking-normal' : 'font-mono uppercase tracking-widest'}`}>
           <span>{isAr ? `احصائيات شهر ${new Date().getMonth() + 1} للعام ${new Date().getFullYear()}` : `Statistics of Month ${new Date().getMonth() + 1} for Year ${new Date().getFullYear()}`}</span>
         </label>
 
@@ -208,7 +208,7 @@ export const StatsView: React.FC<StatsViewProps> = ({ entries, lang, achievedDay
             </svg>
           </div>
           <div>
-            <span className={`text-[10px] text-stone-500 block uppercase font-mono ${isAr ? 'tracking-normal' : 'tracking-wider'}`}>
+            <span className={`text-[10px] text-stone-500 block ${isAr ? 'font-sans tracking-normal' : 'font-mono uppercase tracking-wider'}`}>
               {isAr ? 'أيام تحقيق الهدف' : 'DAYS GOAL ACHIEVED'}
             </span>
             <span className="text-xs font-bold text-stone-200 block font-sans">
@@ -223,7 +223,7 @@ export const StatsView: React.FC<StatsViewProps> = ({ entries, lang, achievedDay
             <Activity size={18} />
           </div>
           <div>
-            <span className={`text-[10px] text-stone-500 block uppercase font-mono ${isAr ? 'tracking-normal' : 'tracking-wider'}`}>
+            <span className={`text-[10px] text-stone-500 block ${isAr ? 'font-sans tracking-normal' : 'font-mono uppercase tracking-wider'}`}>
               {isAr ? 'معدل الإنتاج اليومي' : 'AVG DAILY FOCUS'}
             </span>
             <span className="text-xs font-bold text-stone-200 block font-sans">
@@ -235,7 +235,7 @@ export const StatsView: React.FC<StatsViewProps> = ({ entries, lang, achievedDay
 
       {/* 3) Usefulness Breakdown List */}
       <div className="p-4 bg-[#0E0D0A] border border-[#D4AF37]/15 rounded-2xl space-y-4">
-        <label className={`text-[10px] uppercase font-mono text-[#D4AF37] font-semibold block flex justify-between items-center ${isAr ? 'tracking-normal' : 'tracking-widest'}`}>
+        <label className={`text-[10px] text-[#D4AF37] font-semibold block flex justify-between items-center ${isAr ? 'font-sans tracking-normal' : 'font-mono uppercase tracking-widest'}`}>
           <span>{isAr ? 'توزيع الأوقات حسب الكفاءة والفائدة' : 'USEFULNESS DISTRIBUTIVE BREAKDOWN'}</span>
           <span className="text-stone-500 font-normal lowercase">{isAr ? 'إجمالي الساعات' : 'total hours'}</span>
         </label>
