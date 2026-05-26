@@ -78,6 +78,21 @@ export const StatsView: React.FC<StatsViewProps> = ({ entries, lang, achievedDay
   });
 
   const avgUsefulDailyMins = Math.round(totalUsefulMonthMins / (monthDates.length || 1));
+  
+  const achievedThisMonthCount = monthDates.filter(date => {
+    const dayStr = getDateStr(date);
+    const isToday = new Date().toDateString() === date.toDateString();
+    
+    if (isToday) {
+      const dayEntries = entries.filter(e => getDateStr(new Date(e.start_time)) === dayStr);
+      const useful = dayEntries
+        .filter(e => e.usefulness_status === 'useful')
+        .reduce((acc, c) => acc + c.duration_minutes, 0);
+      return useful >= goalMins && useful > 0;
+    }
+    return !!achievedDaysHistory[dayStr];
+  }).length;
+
   const bestDayLabel = isAr ? 'هذا الشهر' : 'This Month';
 
   // Group by usefulness status for distribution breakdown
@@ -157,7 +172,7 @@ export const StatsView: React.FC<StatsViewProps> = ({ entries, lang, achievedDay
             
             return (
               <div key={i} className={`h-8 flex flex-col items-center justify-center rounded-lg border text-[10px] ${isToday ? 'border-[#D4AF37]/50 bg-[#D4AF37]/5' : 'border-stone-850 bg-[#0E0D0A]'}`}>
-                <span className={`font-mono ${isToday ? 'text-[#D4AF37] font-bold' : 'text-stone-300'}`}>{date.getDate()}</span>
+                <span className={`font-mono ${isToday ? 'text-[#D4AF37] font-bold' : achieved ? 'text-stone-300 font-semibold' : 'text-stone-500'}`}>{date.getDate()}</span>
                 {achieved && (
                     <svg className="w-3 h-3 text-[#D4AF37]" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M5 16L3 5L8.5 10L12 4L15.5 10L21 5L19 16H5Z" />
@@ -171,29 +186,33 @@ export const StatsView: React.FC<StatsViewProps> = ({ entries, lang, achievedDay
         {/* Legend block indicators */}
         <div className="flex justify-center items-center gap-4 text-[10px] font-mono select-none">
           <span className="flex items-center gap-1.5 text-stone-400">
-            <span className="w-2.5 h-2.5 bg-[#D4AF37] rounded-full" />
-            <span>{isAr ? 'وقت ممول' : 'Funded Time'}</span>
+            <svg className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M5 16L3 5L8.5 10L12 4L15.5 10L21 5L19 16H5Z" />
+            </svg>
+            <span>{isAr ? 'تم تحقيق الهدف' : 'Goal Achieved'}</span>
           </span>
           <span className="flex items-center gap-1.5 text-stone-400">
             <span className="w-2.5 h-2.5 bg-[#2E2819] rounded-full border border-stone-800" />
-            <span>{isAr ? 'وقت مجاني' : 'Free Time'}</span>
+            <span>{isAr ? 'لم يتم تحقيق الهدف' : 'Goal Not Achieved'}</span>
           </span>
         </div>
       </div>
 
       {/* 2) Middle Stats Bento grid (Productivity summary cards) */}
       <div className="grid grid-cols-2 gap-3">
-        {/* Card 1: Best Day */}
+        {/* Card 1: Achieved Days count */}
         <div className="bg-[#0E0D0A] border border-stone-850 rounded-2xl p-3.5 flex items-center gap-3">
           <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-[#D4AF37]/20 flex items-center justify-center text-[#D4AF37]">
-            <Award size={18} />
+            <svg className="w-[18px] h-[18px] text-[#D4AF37]" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M5 16L3 5L8.5 10L12 4L15.5 10L21 5L19 16H5Z" />
+            </svg>
           </div>
           <div>
             <span className="text-[10px] text-stone-500 block uppercase tracking-wider font-mono">
-              {isAr ? 'أفضل يوم أداءً' : 'BEST FOCUS DAY'}
+              {isAr ? 'أيام تحقيق الهدف' : 'DAYS GOAL ACHIEVED'}
             </span>
             <span className="text-xs font-bold text-stone-200 block font-sans">
-              {bestDayLabel}
+              {isAr ? `${achievedThisMonthCount} يوم` : `${achievedThisMonthCount} ${achievedThisMonthCount === 1 ? 'Day' : 'Days'}`}
             </span>
           </div>
         </div>
