@@ -60,7 +60,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete, lang }) => {
     >
       {/* Head section */}
       <div className="flex justify-between items-center pt-6">
-        <span className="text-[10px] font-mono tracking-widest text-[#D4AF37] uppercase bg-[#181611]/80 px-2.5 py-1 rounded-full border border-[#D4AF37]/20 flex items-center gap-1">
+        <span className={`text-[10px] font-mono text-[#D4AF37] uppercase bg-[#181611]/80 px-2.5 py-1 rounded-full border border-[#D4AF37]/20 flex items-center gap-1 ${isAr ? 'tracking-normal' : 'tracking-widest'}`}>
           <Zap size={10} className="text-[#D4AF37] animate-pulse" />
           {current.badge}
         </span>

@@ -93,7 +93,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 
       {/* B) Goal Setting */}
       <div className="p-3 bg-[#0E0D0A] border border-[#D4AF37]/15 rounded-2xl space-y-3">
-        <label className="text-[10px] uppercase font-mono tracking-widest text-[#D4AF37] font-semibold block flex justify-between">
+        <label className={`text-[10px] uppercase font-mono text-[#D4AF37] font-semibold block flex justify-between ${isAr ? 'tracking-normal' : 'tracking-widest'}`}>
           <span>{isAr ? 'هدف الانجاز اليومي' : 'Productive Hour Goal'}</span>
           <span>{goalHours} {isAr ? 'ساعات' : 'h'}</span>
         </label>
@@ -109,7 +109,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 
       {/* C) Language Selection */}
       <div className="p-3 bg-[#0E0D0A] border border-[#D4AF37]/15 rounded-2xl space-y-3">
-        <label className="text-[10px] uppercase font-mono tracking-widest text-[#D4AF37] font-semibold block flex justify-between">
+        <label className={`text-[10px] uppercase font-mono text-[#D4AF37] font-semibold block flex justify-between ${isAr ? 'tracking-normal' : 'tracking-widest'}`}>
           {isAr ? 'تغيير لغة الواجهة' : 'Interface Language'}
         </label>
 
@@ -131,7 +131,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 
       {/* D) Data & Backup Management */}
       <div className="p-3 bg-[#0E0D0A] border border-[#D4AF37]/15 rounded-2xl space-y-4">
-        <label className="text-[10px] uppercase font-mono tracking-widest text-[#D4AF37] font-semibold block">
+        <label className={`text-[10px] uppercase font-mono text-[#D4AF37] font-semibold block ${isAr ? 'tracking-normal' : 'tracking-widest'}`}>
           {isAr ? 'إدارة البيانات والنسخ الاحتياطي' : 'DATA & BACKUP MANAGEMENT'}
         </label>
 

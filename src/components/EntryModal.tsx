@@ -388,7 +388,7 @@ export const EntryModal: React.FC<EntryModalProps> = ({
             {!isReadOnly && (
               <div className="flex flex-col gap-2 py-1">
                 <div className="flex items-center justify-between">
-                  <label className="text-[10px] text-stone-500 font-mono tracking-widest uppercase">
+                  <label className={`text-[10px] text-stone-500 font-mono uppercase ${isAr ? 'tracking-normal' : 'tracking-widest'}`}>
                     {isAr ? 'اقتراحات سريعة' : 'Quick Suggestions'}
                   </label>
                   <button 
@@ -433,7 +433,7 @@ export const EntryModal: React.FC<EntryModalProps> = ({
 
           {/* 2) CORE USEFULNESS SCALE (Crucial requested feature!) */}
           <div className="space-y-2 p-3 bg-[#1A1914] border border-[#D4AF37]/15 rounded-2xl">
-            <label className="text-xs font-bold text-[#D4AF37] tracking-wider block flex items-center gap-1">
+            <label className={`text-xs font-bold text-[#D4AF37] block flex items-center gap-1 ${isAr ? 'tracking-normal' : 'tracking-wider'}`}>
               <Tag size={12} />
               {isAr ? 'تصنيف الاستفادة من وقتك: ممول أم مجاني؟' : 'Time Utility: Funded or Free?'}
             </label>
@@ -541,7 +541,7 @@ export const EntryModal: React.FC<EntryModalProps> = ({
 
           {/* 5) NOTES */}
           <div className="space-y-2">
-            <label className="text-xs font-semibold text-stone-300 tracking-wider block">
+            <label className={`text-xs font-semibold text-stone-300 block ${isAr ? 'tracking-normal' : 'tracking-wider'}`}>
               {isAr ? 'ملاحظة أو تدوينة اختيارية' : 'Personal log or context note (Optional)'}
             </label>
             <textarea
@@ -567,7 +567,7 @@ export const EntryModal: React.FC<EntryModalProps> = ({
               id="btn-close-readonly"
               type="button"
               onClick={onClose}
-              className="w-full h-12 rounded-xl bg-stone-900 border border-stone-850 hover:border-[#D4AF37]/30 text-stone-300 font-bold text-sm tracking-wide flex items-center justify-center gap-1.5 cursor-pointer transition-all"
+              className={`w-full h-12 rounded-xl bg-stone-900 border border-stone-850 hover:border-[#D4AF37]/30 text-stone-300 font-bold text-sm flex items-center justify-center gap-1.5 cursor-pointer transition-all ${isAr ? 'tracking-normal' : 'tracking-wide'}`}
             >
               <span>{isAr ? 'إغلاق المعاينة' : 'Close Preview'}</span>
             </button>
@@ -577,7 +577,7 @@ export const EntryModal: React.FC<EntryModalProps> = ({
                 id="btn-save-entry"
                 type="button"
                 onClick={handleSave}
-                className="w-full h-12 rounded-xl bg-gradient-to-r from-[#D5B038] to-[#C59B27] hover:from-[#E5C354] hover:to-[#B58B17] text-[#0C0C0B] font-bold text-sm tracking-wide flex items-center justify-center gap-1.5 cursor-pointer"
+                className={`w-full h-12 rounded-xl bg-gradient-to-r from-[#D5B038] to-[#C59B27] hover:from-[#E5C354] hover:to-[#B58B17] text-[#0C0C0B] font-bold text-sm flex items-center justify-center gap-1.5 cursor-pointer ${isAr ? 'tracking-normal' : 'tracking-wide'}`}
               >
                 <Check size={16} />
                 <span>{isAr ? 'حفظ السجل وتأكيد' : 'Affirm and Save'}</span>

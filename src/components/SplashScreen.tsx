@@ -54,19 +54,19 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish, lang }) =>
         {/* Brand Typography */}
         <h1 
           id="splash-brand-title"
-          className="text-3xl font-bold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-[#FAF8F5] via-[#D4AF37] to-[#FAF8F5] font-sans text-center"
+          className={`text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#FAF8F5] via-[#D4AF37] to-[#FAF8F5] font-sans text-center ${isAr ? 'tracking-normal' : 'tracking-wider'}`}
         >
           {isAr ? 'المجد تتبع وقتك' : 'AlMajd - Track your time'}
         </h1>
         
-        <p id="splash-brand-subtitle" className="text-stone-400 text-xs mt-3 tracking-widest text-center max-w-[280px]">
+        <p id="splash-brand-subtitle" className={`text-stone-400 text-xs mt-3 text-center max-w-[280px] ${isAr ? 'tracking-normal' : 'tracking-widest'}`}>
           {isAr ? 'تتبع وقتك كن من النخبة' : 'Premium Time Analytics for Achievers'}
         </p>
       </div>
 
       {/* Modern Status Footer */}
       <div className="flex flex-col items-center gap-4 w-full max-w-[200px]">
-        <div className="flex items-center gap-1 text-[10px] text-amber-500/80 uppercase tracking-widest font-mono">
+        <div className={`flex items-center gap-1 text-[10px] text-amber-500/80 uppercase font-mono ${isAr ? 'tracking-normal' : 'tracking-widest'}`}>
           <Zap size={10} className="text-[#D4AF37] animate-bounce" />
           <span>{isAr ? 'تهيئة التخزين المحلي الآمن' : 'Loading Local Vault'}{dots}</span>
         </div>

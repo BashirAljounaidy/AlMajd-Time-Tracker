@@ -151,13 +151,13 @@ export const TodayView: React.FC<TodayViewProps> = ({
         
         {/* Elite Brand Header mimicking the Reference Image */}
         <div className="px-3 pt-4 pb-2 select-none flex flex-col">
-          <span className="text-[10px] font-mono text-stone-400 uppercase tracking-widest leading-none mb-1.5 font-semibold">
+          <span className={`text-[10px] font-mono text-stone-400 uppercase leading-none mb-1.5 font-semibold ${isAr ? 'tracking-normal' : 'tracking-widest'}`}>
             {isAr ? 'المجد امتلك يومك امتلك حياتك' : 'ALMAJD: OWN YOUR DAY, OWN YOUR LIFE'}
           </span>
           <div className="text-2xl font-extrabold font-sans text-[#D4AF37] tracking-tight uppercase">
             {formatDateString(currentDate)}
           </div>
-          <div className="flex items-center gap-2 mt-2 bg-[#D4AF37]/10 border border-[#D4AF37]/25 text-[#D4AF37] px-3 py-1.5 rounded-xl text-[10px] font-mono tracking-widest uppercase w-fit select-none">
+          <div className={`flex items-center gap-2 mt-2 bg-[#D4AF37]/10 border border-[#D4AF37]/25 text-[#D4AF37] px-3 py-1.5 rounded-xl text-[10px] font-mono uppercase w-fit select-none ${isAr ? 'tracking-normal' : 'tracking-widest'}`}>
             <span className="w-1.5 h-1.5 rounded-full bg-[#D4AF37] animate-pulse" />
             <span>{isAr ? `الهدف اليومي: ${goalHours} ساعات ممولة` : `DAILY TARGET: ${goalHours} FUNDED HOURS`}</span>
           </div>
@@ -176,7 +176,7 @@ export const TodayView: React.FC<TodayViewProps> = ({
             <div className="col-span-7 space-y-2.5">
               
                   <div className="space-y-0.5">
-                    <span className="text-[10px] text-stone-500 uppercase tracking-wider font-mono block">
+                    <span className={`text-[10px] text-stone-500 uppercase font-mono block ${isAr ? 'tracking-normal' : 'tracking-wider'}`}>
                       {isAr ? 'إجمالي الوقت المسجّل' : 'TOTAL TRACKED'}
                     </span>
                     <p id="metric-total-tracked" className="text-stone-100 font-bold text-lg font-sans leading-none flex items-center gap-1">
@@ -246,7 +246,7 @@ export const TodayView: React.FC<TodayViewProps> = ({
                 {/* Inner percentage metrics */}
                 <div className="absolute inset-0 flex flex-col items-center justify-center leading-none">
                   <span id="scorecard-percent" className="font-bold text-lg font-sans text-stone-100">{progressPercentage}%</span>
-                  <span className="text-[7.5px] uppercase text-stone-500 font-mono tracking-wider mt-0.5">
+                  <span className={`text-[7.5px] uppercase text-stone-500 font-mono mt-0.5 ${isAr ? 'tracking-normal' : 'tracking-wider'}`}>
                     {isAr ? 'إنجاز' : 'Goal'}
                   </span>
                 </div>
@@ -264,7 +264,7 @@ export const TodayView: React.FC<TodayViewProps> = ({
       {/* 3) Dynamic Timeline List */}
       <div className="px-3 pt-2 space-y-2">
         
-        <h3 className="text-[11px] uppercase tracking-widest font-mono text-stone-500 font-bold px-1 select-none">
+        <h3 className={`text-[11px] uppercase font-mono text-stone-500 font-bold px-1 select-none ${isAr ? 'tracking-normal' : 'tracking-widest'}`}>
           {isAr ? 'التسلسل الزمني لليوم' : 'CHRONOLOGY SLOTS'}
         </h3>
 
