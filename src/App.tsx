@@ -4,13 +4,13 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { 
-  Calendar, 
-  CheckSquare, 
-  BarChart3, 
-  Settings, 
-  Clock, 
-  Play, 
+import {
+  Calendar,
+  CheckSquare,
+  BarChart3,
+  Settings,
+  Clock,
+  Play,
   Pause,
   ArrowRight,
   AlertTriangle,
@@ -325,13 +325,13 @@ export default function App() {
     localStorage.removeItem('productiveGoalHours');
     localStorage.removeItem('goal_achieved_days');
     localStorage.removeItem('chrono_review_onboarding_completed');
-    
+
     setEntries([]);
     setAchievedDaysHistory({});
     setUserStats({});
     setCategories(DEFAULT_CATEGORIES);
     localStorage.setItem('chrono_review_categories', JSON.stringify(DEFAULT_CATEGORIES));
-    
+
     alert(isAr ? 'تم مسح كامل البيانات بنجاح! 🧹' : 'All data wiped successfully! 🧹');
     window.location.reload();
   };
@@ -406,24 +406,24 @@ export default function App() {
     <div id="main-app" className="font-sans h-[100dvh] flex flex-col bg-[#070707] text-[#FAF8F5] overflow-hidden" dir={isAr ? 'rtl' : 'ltr'}>
       {/* 1) Dynamic Splash Intro Layer */}
       {showSplash && (
-        <SplashScreen 
-          lang={lang} 
-          onFinish={() => setShowSplash(false)} 
+        <SplashScreen
+          lang={lang}
+          onFinish={() => setShowSplash(false)}
         />
       )}
 
       {/* 2) Onboarding Carousel Layer */}
       {!showSplash && showOnboarding && (
-        <Onboarding 
-          lang={lang} 
-          onComplete={handleOnboardingFinished} 
+        <Onboarding
+          lang={lang}
+          onComplete={handleOnboardingFinished}
         />
       )}
 
       {/* --- LIVE TIMER FLOATING GLOW TOP BAR --- */}
       {/* If timer is actively running, pin a floating golden toolbar so the user doesn't forget! */}
       {runningTimer.is_running && !showTimerModal && !showSplash && !showOnboarding && (
-        <div 
+        <div
           id="running-timer-toast"
           onClick={() => setShowTimerModal(true)}
           className="bg-gradient-to-r from-[#1E1B12] via-[#2F2916] to-[#1E1B12] border-b border-[#D4AF37]/40 py-2 px-5 flex items-center justify-between text-xs cursor-pointer select-none animate-[fadeIn_0.3s] z-30 shrink-0 font-sans"
@@ -444,10 +444,10 @@ export default function App() {
       {/* --- MAIN ROOT APP VIEWPORTS --- */}
       {!showSplash && !showOnboarding && (
         <div id="main-tabs-viewport" className="flex-1 flex flex-col overflow-hidden relative">
-          
+
           {/* Active Router mapping */}
           {activeTab === 'today' && (
-            <TodayView 
+            <TodayView
               currentDate={currentDate}
               onNavigateDate={handleNavigateWeeks}
               entries={entries}
@@ -459,7 +459,7 @@ export default function App() {
           )}
 
           {activeTab === 'review' && (
-            <ReviewView 
+            <ReviewView
               entries={entries}
               currentDate={currentDate}
               onEditEntryClick={handleOpenEditEntryModal}
@@ -469,7 +469,7 @@ export default function App() {
           )}
 
           {activeTab === 'stats' && (
-            <StatsView 
+            <StatsView
               entries={entries}
               lang={lang}
               achievedDaysHistory={achievedDaysHistory}
@@ -477,7 +477,7 @@ export default function App() {
           )}
 
           {activeTab === 'settings' && (
-            <SettingsView 
+            <SettingsView
               stats={userStats}
               onUpdateStats={handleUpdateStats}
               onRestoreSeedData={handleRestoreDefaultSeeds}
@@ -499,7 +499,7 @@ export default function App() {
           {/* --- BOTTOM CALENDAR STRIP & CONTROLS (Directly above Bottom Nav mimicking the picture) --- */}
           {(activeTab === 'today' || activeTab === 'review') && (
             <div dir="ltr" className="px-4 py-2 bg-[#090908] border-t border-stone-900/40 flex flex-row items-center justify-between select-none shrink-0 w-full">
-              
+
               {/* Horizontal mini date strip scrolling */}
               <div className="flex flex-row items-center gap-1.5 overflow-x-auto no-scrollbar py-1 flex-1 mr-3">
                 {getDateStripDays(currentDate).map((date, idx) => {
@@ -510,11 +510,10 @@ export default function App() {
                     <button
                       key={idx}
                       onClick={() => setCurrentDate(date)}
-                      className={`flex flex-col items-center justify-center rounded-xl p-1.5 min-w-[50px] h-[52px] cursor-pointer transition-all ${
-                        isSelected 
-                          ? 'bg-[#D4AF37] text-black font-bold border border-[#D4AF37] shadow-[0_0_12px_rgba(212,175,55,0.25)]' 
+                      className={`flex flex-col items-center justify-center rounded-xl p-1.5 min-w-[50px] h-[52px] cursor-pointer transition-all ${isSelected
+                          ? 'bg-[#D4AF37] text-black font-bold border border-[#D4AF37] shadow-[0_0_12px_rgba(212,175,55,0.25)]'
                           : 'bg-[#121210] hover:bg-[#1C1A14] text-stone-400 border border-stone-850'
-                      }`}
+                        }`}
                     >
                       <span className={`text-[8px] uppercase font-mono ${isSelected ? 'text-black' : 'text-stone-500'}`}>
                         {dayStr}
@@ -537,11 +536,10 @@ export default function App() {
                   id="strip-add-entry-btn"
                   onClick={() => !isPastDate(currentDate) && handleOpenAddEntryModal()}
                   disabled={isPastDate(currentDate)}
-                  className={`w-11 h-11 rounded-xl flex items-center justify-center text-black cursor-pointer transition-all ${
-                    isPastDate(currentDate)
+                  className={`w-11 h-11 rounded-xl flex items-center justify-center text-black cursor-pointer transition-all ${isPastDate(currentDate)
                       ? 'bg-stone-800 border border-stone-700 text-stone-500 cursor-not-allowed opacity-50'
                       : 'bg-[#D4AF37] hover:bg-[#E5C354] border border-[#D4AF37] shadow-[0_0_15px_rgba(212,175,55,0.3)] hover:shadow-[0_0_20px_rgba(212,175,55,0.45)] active:scale-95'
-                  }`}
+                    }`}
                   title={isAr ? 'اضافة يدوي' : 'Add Manual'}
                 >
                   <Plus size={18} className="stroke-[3]" />
@@ -552,11 +550,10 @@ export default function App() {
                   id="strip-stopwatch-launch"
                   onClick={() => !isPastDate(currentDate) && handleStartTimerOnTheFly()}
                   disabled={isPastDate(currentDate)}
-                  className={`w-11 h-11 rounded-xl flex items-center justify-center text-black cursor-pointer transition-all ${
-                    isPastDate(currentDate)
+                  className={`w-11 h-11 rounded-xl flex items-center justify-center text-black cursor-pointer transition-all ${isPastDate(currentDate)
                       ? 'bg-stone-800 border border-stone-700 text-stone-500 cursor-not-allowed opacity-50'
                       : 'bg-[#D4AF37] hover:bg-[#E5C354] border border-[#D4AF37] shadow-[0_0_15px_rgba(212,175,55,0.3)] hover:shadow-[0_0_20px_rgba(212,175,55,0.45)] active:scale-95'
-                  }`}
+                    }`}
                   title={isAr ? 'تشغيل المؤقت التلقائي' : 'Launch stopwatch'}
                 >
                   <Clock size={16} className="stroke-[2.5]" />
@@ -567,7 +564,7 @@ export default function App() {
           )}
 
           {/* --- BOTTOM SHIELD NAVIGATION PANEL (Luxury gold highlights) --- */}
-          <nav 
+          <nav
             id="app-bottom-nav"
             dir="rtl"
             className="min-h-[4rem] pb-[calc(4px+env(safe-area-inset-bottom))] px-4 bg-[#0A0A09] border-t border-stone-850 flex justify-between items-center relative z-40 shrink-0 select-none"
@@ -576,9 +573,8 @@ export default function App() {
             <button
               id="tab-btn-today"
               onClick={() => setActiveTab('today')}
-              className={`flex-1 flex flex-col items-center justify-center gap-1.5 cursor-pointer py-1 ${
-                activeTab === 'today' ? 'text-[#D4AF37]' : 'text-stone-600 hover:text-stone-400'
-              }`}
+              className={`flex-1 flex flex-col items-center justify-center gap-1.5 cursor-pointer py-1 ${activeTab === 'today' ? 'text-[#D4AF37]' : 'text-stone-600 hover:text-stone-400'
+                }`}
             >
               <Calendar size={18} className={activeTab === 'today' ? 'stroke-[2.5]' : 'stroke-[1.8]'} />
               <span className="text-[9.5px] font-semibold tracking-tight">{isAr ? 'اليوم' : 'Today'}</span>
@@ -588,9 +584,8 @@ export default function App() {
             <button
               id="tab-btn-review"
               onClick={() => setActiveTab('review')}
-              className={`flex-1 flex flex-col items-center justify-center gap-1.5 cursor-pointer py-1 ${
-                activeTab === 'review' ? 'text-[#D4AF37]' : 'text-stone-600 hover:text-stone-400'
-              }`}
+              className={`flex-1 flex flex-col items-center justify-center gap-1.5 cursor-pointer py-1 ${activeTab === 'review' ? 'text-[#D4AF37]' : 'text-stone-600 hover:text-stone-400'
+                }`}
             >
               <CheckSquare size={18} className={activeTab === 'review' ? 'stroke-[2.5]' : 'stroke-[1.8]'} />
               <span className="text-[9.5px] font-semibold tracking-tight">{isAr ? 'المراجعة' : 'Review'}</span>
@@ -600,9 +595,8 @@ export default function App() {
             <button
               id="tab-btn-stats"
               onClick={() => setActiveTab('stats')}
-              className={`flex-1 flex flex-col items-center justify-center gap-1.5 cursor-pointer py-1 ${
-                activeTab === 'stats' ? 'text-[#D4AF37]' : 'text-stone-600 hover:text-stone-400'
-              }`}
+              className={`flex-1 flex flex-col items-center justify-center gap-1.5 cursor-pointer py-1 ${activeTab === 'stats' ? 'text-[#D4AF37]' : 'text-stone-600 hover:text-stone-400'
+                }`}
             >
               <BarChart3 size={18} className={activeTab === 'stats' ? 'stroke-[2.5]' : 'stroke-[1.8]'} />
               <span className="text-[9.5px] font-semibold tracking-tight">{isAr ? 'التحليل' : 'Metrics'}</span>
@@ -612,9 +606,8 @@ export default function App() {
             <button
               id="tab-btn-settings"
               onClick={() => setActiveTab('settings')}
-              className={`flex-1 flex flex-col items-center justify-center gap-1.5 cursor-pointer py-1 ${
-                activeTab === 'settings' ? 'text-[#D4AF37]' : 'text-stone-600 hover:text-stone-400'
-              }`}
+              className={`flex-1 flex flex-col items-center justify-center gap-1.5 cursor-pointer py-1 ${activeTab === 'settings' ? 'text-[#D4AF37]' : 'text-stone-600 hover:text-stone-400'
+                }`}
             >
               <Settings size={18} className={activeTab === 'settings' ? 'stroke-[2.5]' : 'stroke-[1.8]'} />
               <span className="text-[9.5px] font-semibold tracking-tight">{isAr ? 'الضبط' : 'Settings'}</span>
@@ -625,7 +618,7 @@ export default function App() {
 
       {/* --- OPTIONAL FULL-SCALE DRAWER: TIMER CONTROL SHEET --- */}
       {showTimerModal && (
-        <div 
+        <div
           id="timer-overlay"
           className="absolute inset-0 bg-black/80 backdrop-blur-sm z-55 flex flex-col justify-end text-sans"
         >
@@ -683,7 +676,7 @@ export default function App() {
             )}
 
             <div className="flex-1 overflow-y-auto no-scrollbar">
-              <TimerSheet 
+              <TimerSheet
                 timer={runningTimer}
                 onUpdateTimer={handleUpdateTimer}
                 onSaveTimerEntry={handleSaveTimerEntry}
@@ -696,7 +689,7 @@ export default function App() {
       )}
 
       {/* --- ADD / EDIT ENTRY MODAL SHEET --- */}
-      <EntryModal 
+      <EntryModal
         isOpen={showEntryModal}
         onClose={() => setShowEntryModal(false)}
         onSave={handleSaveEntry}
