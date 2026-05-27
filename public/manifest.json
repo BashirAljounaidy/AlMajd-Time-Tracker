@@ -1,0 +1,30 @@
+{
+  "short_name": "المجد تعقب الوقت",
+  "name": "تعقب الوقت - مجموعة المجد | Al Majd Time Tracker",
+  "description": "نظام إدارة وتتبع الوقت النخبوي لمجموعة المجد",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#070707",
+  "theme_color": "#070707",
+  "display": "standalone",
+  "orientation": "portrait"
+}
