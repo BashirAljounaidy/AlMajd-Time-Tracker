@@ -6,4 +6,5 @@
     <path d="M 22 65 L 22 30 L 50 51" />
     <path d="M 50 20 L 68 65" />
   </g>
+  <text x="50" y="84" fill="#D4AF37" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="800" text-anchor="middle" letter-spacing="0.5">Al Majd</text>
 </svg>
