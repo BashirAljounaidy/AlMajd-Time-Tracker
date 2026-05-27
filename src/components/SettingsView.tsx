@@ -17,6 +17,8 @@ interface SettingsViewProps {
   categories: Category[];
   lang: 'ar' | 'en';
   onLangChange: (lang: 'ar' | 'en') => void;
+  productiveGoalHours: number;
+  onGoalHoursChange: (val: number) => void;
 }
 
 export const SettingsView: React.FC<SettingsViewProps> = ({
@@ -29,18 +31,16 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   categories,
   lang,
   onLangChange,
+  productiveGoalHours,
+  onGoalHoursChange,
 }) => {
   const isAr = lang === 'ar';
 
-  const [goalHours, setGoalHours] = useState(() => {
-    const saved = localStorage.getItem('productiveGoalHours') || '8';
-    return parseInt(saved);
-  });
+  const goalHours = productiveGoalHours;
 
   const handleGoalChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = parseInt(e.target.value) || 0;
-    setGoalHours(val);
-    localStorage.setItem('productiveGoalHours', val.toString());
+    onGoalHoursChange(val);
   };
 
   const handleExportJSON = () => {

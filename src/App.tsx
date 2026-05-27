@@ -81,6 +81,9 @@ export default function App() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [userStats, setUserStats] = useState<UserStats>({});
   const [achievedDaysHistory, setAchievedDaysHistory] = useState<Record<string, boolean>>({});
+  const [productiveGoalHours, setProductiveGoalHours] = useState(() => {
+    return parseInt(localStorage.getItem('productiveGoalHours') || '8');
+  });
   const [runningTimer, setRunningTimer] = useState<ActiveTimer>({
     start_time: '',
     accumulated_seconds: 0,
@@ -151,7 +154,7 @@ export default function App() {
     }
   }, []);
 
-  // --- DAY-END EVALUATOR & HISTORICAL FREEZE ---
+  // --- DAY-END EVALUATOR & HISTORICAL RE-EVALUATION ---
   useEffect(() => {
     const storHistory = localStorage.getItem('chrono_review_achieved_days_history');
     let history: Record<string, boolean> = {};
@@ -167,8 +170,7 @@ export default function App() {
     const getFormattedDate = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 
     const todayStr = getFormattedDate(new Date());
-    const goalHours = parseInt(localStorage.getItem('productiveGoalHours') || '8');
-    const goalMins = goalHours * 60;
+    const goalMins = productiveGoalHours * 60;
 
     // We collect all past days that need evaluation:
     // 1) Past days of this month (to cover empty days)
@@ -193,25 +195,31 @@ export default function App() {
       }
     });
 
-    let updated = false;
+    const nextHistory: Record<string, boolean> = {};
     pastDatesToEvaluate.forEach(dateStr => {
-      if (history[dateStr] === undefined) {
-        const dayEntries = entries.filter(e => getFormattedDate(new Date(e.start_time)) === dateStr);
-        const useful = dayEntries
-          .filter(e => e.usefulness_status === 'useful')
-          .reduce((acc, c) => acc + c.duration_minutes, 0);
+      const dayEntries = entries.filter(e => getFormattedDate(new Date(e.start_time)) === dateStr);
+      const useful = dayEntries
+        .filter(e => e.usefulness_status === 'useful')
+        .reduce((acc, c) => acc + c.duration_minutes, 0);
 
-        // Freeze this day: if useful >= goalMins, then it is achieved!
-        history[dateStr] = useful >= goalMins && useful > 0;
-        updated = true;
-      }
+      nextHistory[dateStr] = useful >= goalMins && useful > 0;
     });
 
-    if (updated || !storHistory) {
-      localStorage.setItem('chrono_review_achieved_days_history', JSON.stringify(history));
+    // Check if anything changed compared to stored history
+    let isDifferent = false;
+    const allKeys = new Set([...Object.keys(history), ...Object.keys(nextHistory)]);
+    for (const key of allKeys) {
+      if (history[key] !== nextHistory[key]) {
+        isDifferent = true;
+        break;
+      }
     }
-    setAchievedDaysHistory(history);
-  }, [entries]);
+
+    if (isDifferent || !storHistory) {
+      localStorage.setItem('chrono_review_achieved_days_history', JSON.stringify(nextHistory));
+      setAchievedDaysHistory(nextHistory);
+    }
+  }, [entries, productiveGoalHours]);
 
   // --- PERSIST SAVER HELPERS ---
   const saveEntriesToDb = (newEntries: TimeEntry[]) => {
@@ -291,6 +299,7 @@ export default function App() {
       }
       if (backupData.productiveGoalHours) {
         localStorage.setItem('productiveGoalHours', backupData.productiveGoalHours.toString());
+        setProductiveGoalHours(backupData.productiveGoalHours);
       }
       if (backupData.userStats) {
         setUserStats(backupData.userStats);
@@ -315,6 +324,7 @@ export default function App() {
     setEntries([]);
     setAchievedDaysHistory({});
     setUserStats({});
+    setProductiveGoalHours(8);
     setCategories(DEFAULT_CATEGORIES);
     localStorage.setItem('chrono_review_categories', JSON.stringify(DEFAULT_CATEGORIES));
 
@@ -441,6 +451,7 @@ export default function App() {
               onEditEntryClick={handleOpenEditEntryModal}
               onStartTimerQuick={handleStartTimerOnTheFly}
               lang={lang}
+              productiveGoalHours={productiveGoalHours}
             />
           )}
 
@@ -459,6 +470,7 @@ export default function App() {
               entries={entries}
               lang={lang}
               achievedDaysHistory={achievedDaysHistory}
+              productiveGoalHours={productiveGoalHours}
             />
           )}
 
@@ -473,6 +485,11 @@ export default function App() {
               categories={categories}
               lang={lang}
               onLangChange={setLang}
+              productiveGoalHours={productiveGoalHours}
+              onGoalHoursChange={(val) => {
+                setProductiveGoalHours(val);
+                localStorage.setItem('productiveGoalHours', val.toString());
+              }}
             />
           )}
 

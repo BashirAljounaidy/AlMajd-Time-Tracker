@@ -12,9 +12,10 @@ interface StatsViewProps {
   entries: TimeEntry[];
   lang: 'ar' | 'en';
   achievedDaysHistory: Record<string, boolean>;
+  productiveGoalHours: number;
 }
 
-export const StatsView: React.FC<StatsViewProps> = ({ entries, lang, achievedDaysHistory }) => {
+export const StatsView: React.FC<StatsViewProps> = ({ entries, lang, achievedDaysHistory, productiveGoalHours }) => {
   const isAr = lang === 'ar';
 
   // Helper relative weekdays mapping based on current date
@@ -65,7 +66,7 @@ export const StatsView: React.FC<StatsViewProps> = ({ entries, lang, achievedDay
   };
 
   const monthDates = getMonthDays();
-  const goalHours = parseInt(localStorage.getItem('productiveGoalHours') || '8');
+  const goalHours = productiveGoalHours;
   const goalMins = goalHours * 60;
 
   // Calculate highest productive day and total stats

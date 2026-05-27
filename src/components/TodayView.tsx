@@ -15,6 +15,7 @@ interface TodayViewProps {
   onEditEntryClick: (entry: TimeEntry) => void;
   onStartTimerQuick: () => void;
   lang: 'ar' | 'en';
+  productiveGoalHours: number;
 }
 
 export const TodayView: React.FC<TodayViewProps> = ({
@@ -25,6 +26,7 @@ export const TodayView: React.FC<TodayViewProps> = ({
   onEditEntryClick,
   onStartTimerQuick,
   lang,
+  productiveGoalHours,
 }) => {
   const isAr = lang === 'ar';
 
@@ -62,14 +64,7 @@ export const TodayView: React.FC<TodayViewProps> = ({
     })
     .sort((a, b) => new Date(b.start_time).getTime() - new Date(a.start_time).getTime());
 
-  const [goalHours, setGoalHours] = React.useState(() => {
-    const saved = localStorage.getItem('productiveGoalHours') || '8';
-    return parseInt(saved);
-  });
-
-  React.useEffect(() => {
-    localStorage.setItem('productiveGoalHours', goalHours.toString());
-  }, [goalHours]);
+  const goalHours = productiveGoalHours;
 
   // Calculations for Today's metrics
   const totalTrackedMins = dailyEntries.reduce((acc, curr) => acc + curr.duration_minutes, 0);
